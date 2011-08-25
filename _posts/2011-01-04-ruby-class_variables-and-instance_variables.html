@@ -1,0 +1,69 @@
+--- 
+layout: post
+title: ruby class_variables and instance_variables
+tags: 
+- ruby
+- Ruby&amp;Rails
+- variables
+status: publish
+type: post
+published: true
+meta: 
+  _edit_last: "1"
+  _edit_lock: "1294112192"
+  dsq_thread_id: "245119892"
+---
+Ruby 中的类变量和实例变量
+<p>例子</p>
+[cc lang="ruby"]
+class Foo
+	@instance_variable = "I am a instance_variable"
+	@@class_variable = "I am a class_variable"
+	
+	def	just_output
+		p @instance_variable
+		p @@class_variable
+	end
+end
+
+Foo.instance_variables
+  #=>   ["@instance_variable"]
+
+Foo.class_variables
+  #=>  ["@@class_variable"]
+
+Foo.new.just_output
+  #=>  nil
+  #=>  "I am a class_variable"
+[/cc]
+说明：可以看到，实例变量赋初始值都是nil（在初始化 initialization 中除外），而类变量是可以有初始值的。
+<p>下面看看作用范围</p>
+[cc lang="ruby"]
+class Foo
+	@instance_variable = "I am a instance_variable"
+	@@class_variable = "I am a class_variable"
+	
+	def	change
+		@instance_variable = "Changed!"
+		@@class_variable = "Changed!"	
+	end
+	
+	def	just_output
+		p @instance_variable
+		p @@class_variable
+	end
+end
+
+foo = Foo.new
+foo.change
+foo.just_output
+  #=>  "Changed!"
+  #=>  "Changed!"
+# 上面的输出可能看不出区别，继续
+
+bar = Foo.new
+bar.just_output
+  #=>  nil
+  #=>  "Changed!"
+[/cc]
+说明：实例变量单个实例共享，所以@instance_variable只在 foo 这个实例有值，到 bar 这个实例又是 nil 了。类变量的作用范围是类，所以 foo 和 bar 都是 Foo的实例，都有类变量 @@class_variable 。

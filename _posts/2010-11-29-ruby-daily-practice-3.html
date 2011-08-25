@@ -1,0 +1,26 @@
+--- 
+layout: post
+title: ruby daily practice 3
+tags: 
+- Ruby&amp;Rails
+- "\xE9\x9D\xA2\xE8\xAF\x95\xE9\xA2\x98"
+status: publish
+type: post
+published: true
+meta: 
+  _syntaxhighlighter_encoded: "1"
+  _edit_lock: "1292778124"
+  _edit_last: "1"
+  _wp_old_slug: ""
+  dsq_thread_id: "260044794"
+---
+<blockquote>谷歌面试题：1024! 末尾有多少个0？</blockquote>
+分析：1024的阶乘，就是看1024有多少的2和5，2的个数比5多，那就是看有多少5。
+[cc lang="ruby"]
+5的倍数，1024/5 = 204个
+25的倍数，1024/25 = 40个
+125的倍数，1024/125 = 8个
+625的倍数：1024/625 = 1个
+
+#所以加起来一共 253个0
+[/cc]

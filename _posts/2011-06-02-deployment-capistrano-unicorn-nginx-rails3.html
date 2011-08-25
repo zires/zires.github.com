@@ -1,0 +1,83 @@
+--- 
+layout: post
+title: deployment capistrano unicorn nginx rails3
+tags: 
+- capistrano
+- deployment
+- nginx
+- Ruby&amp;Rails
+- unicorn
+status: publish
+type: post
+published: true
+meta: 
+  _edit_last: "1"
+  _edit_lock: "1306956559"
+  dsq_thread_id: "320863003"
+  _wp_old_slug: ""
+---
+How deploy rails3 application using capistrano，unicorn，and nginx.
+As we know，Capistrano is a auto-deploy tool kit just like Rake.
+
+First，Let us deploy with unicorn and nginx on the server.
+1）install nginx
+[cc]
+sudo apt-get install nginx
+[/cc]
+2）install unicorn
+[cc]
+[sudo] gem install unicorn
+[/cc]
+3）config unicorn under nginx
+Find where is your nginx directory. Mine is /etc/nginx.
+<br />
+<a href="https://gist.github.com/1002990" target="_blank"><strong>nginx.conf</strong></a>
+<br />
+<a href="https://gist.github.com/1003002" target="_blank"><strong>conf.d/unicorn.conf</strong></a>
+[cc]
+NOTE!!!
+# path for static files
+root /path/to/your_app/current/public;
+
+# Rails error pages
+error_page 500 502 503 504 /500.html;
+location = /500.html {
+  root /path/to/your_app/current/public;
+}
+[/cc]
+
+<p>Now，go into your application directory. Copy unicorn.rb into config directory.</p>
+<p><a href="https://gist.github.com/1003028" target="_blank"><strong>unicorn.rb</strong></a></p>
+run:
+[cc]
+[sudo] unicorn_rails -c /config/unicorn.rb -D -E production
+[/cc]
+
+And than restart your nginx server. Finished!
+
+Next let's set up <a href="https://github.com/capistrano/capistrano" target="_blank">capistrano</a> for rails3 application.
+4）install capistrano
+add capistrano in your Gemfile
+[cc]
+gem 'capistrano'
+[/cc]
+Than
+[cc]
+[sudo] bundle install
+[/cc]
+And
+[cc]
+capify .
+# This will create Capfile under the root and deploy.rb under /config
+[/cc]
+
+6）The last thing is create your own deploy.rb file
+<br />
+<a href="https://gist.github.com/1003099" target="_blank"><strong>deploy.rb</strong></a>
+<br />
+Finally
+[cc]
+cap deploy
+[/cc]
+
+The End.

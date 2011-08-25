@@ -1,0 +1,346 @@
+--- 
+layout: post
+title: "rails3 \xE5\x88\x9D\xE5\xA7\x8B\xE5\x8C\x96\xE5\x92\x8C\xE5\x90\xAF\xE5\x8A\xA8 Initialization Process"
+tags: 
+- Initialization
+- rails3
+- Ruby&amp;Rails
+status: publish
+type: post
+published: true
+meta: 
+  _edit_lock: "1298088537"
+  _edit_last: "1"
+  dsq_thread_id: "247838809"
+---
+一直想搞清楚rails的启动和整个生命进程，好在有官方的guide用来参考，<a href="http://ryanbigg.com/guides/initialization.html">The Rails Initialization Process</a>。
+1）<strong>先来看看rails的组织结构</strong>
+[cc lang="ruby"]
+%w(
+  actionmailer
+  actionpack
+  activemodel
+  activerecord
+  activeresource
+  activesupport
+  railties
+)
+[/cc]
+
+2）<strong>rails是如何启动的？</strong>
+按下‘rails s’ 命令发生了什么？
+rails3中rails已经变成了一个全局的命令，s是它的参数，s是server的缩写。
+rails命令在gem包的bin/rails脚本中
+[cc lang="ruby"]
+#!/usr/bin/env ruby
+
+begin
+  require "rails/cli"
+rescue LoadError
+  railties_path = File.expand_path('../../railties/lib', __FILE__)
+  $:.unshift(railties_path)
+  require "rails/cli"
+end
+[/cc]
+如果找不到rails/cli就把railties_path加到当前环境变量中。railties作用是将每个rails模块串联起来，它负责rails的启动顺序，管理rails的命令行接口，并且提供Rails的generators。
+<p>" rails/cli " 是负责什么的？</p>
+[cc lang="ruby"]
+require 'rbconfig'
+require 'rails/script_rails_loader'
+
+# If we are inside a Rails application this method performs an exec and thus
+# the rest of this script is not run.
+Rails::ScriptRailsLoader.exec_script_rails!
+
+require 'rails/ruby_version_check'
+Signal.trap("INT") { puts; exit(1) }
+
+if ARGV.first == 'plugin'
+  ARGV.shift
+  require 'rails/commands/plugin_new'
+else
+  require 'rails/commands/application'
+end
+
+[/cc]
+
+rbconfig是对ruby标准库的配置和补充，在ruby编译的时候起效，和rails关系不大，不谈。
+走进script_rails_loader.rb文件，里面定义了两个常量
+[cc lang="ruby"]
+RUBY = File.join(*RbConfig::CONFIG.values_at("bindir", "ruby_install_name")) + RbConfig::CONFIG["EXEEXT"]
+SCRIPT_RAILS = File.join('script', 'rails')
+[/cc]
+RUBY是ruby的bin文件位置，不管是Mac OS还是Windows还是其他，都会指向可执行文件。
+SCRIPT_RAILS就是指向rails生成项目script目录下的rails脚本。大体内容如下：
+[cc lang="ruby"]
+#!/usr/bin/env ruby
+# This command will automatically be run when you run "rails" with Rails 3 gems installed from the root of your application.
+
+APP_PATH = File.expand_path('../../config/application',  __FILE__)
+require File.expand_path('../../config/boot',  __FILE__)
+require 'rails/commands'
+
+[/cc]
+
+回到cli文件中，下一句可以看到执行了一个方法
+[cc lang="ruby"]
+Rails::ScriptRailsLoader.exec_script_rails!
+[/cc]
+exec_script_rails!方法的内容：
+[cc lang="ruby"]
+def self.exec_script_rails!
+      cwd = Dir.pwd
+      return unless in_rails_application? || in_rails_application_subdirectory?
+      exec RUBY, SCRIPT_RAILS, *ARGV if in_rails_application?
+      Dir.chdir("..") do
+        # Recurse in a chdir block: if the search fails we want to be sure
+        # the application is generated in the original working directory.
+        exec_script_rails! unless cwd == Dir.pwd
+end
+[/cc]
+<p> exec RUBY, SCRIPT_RAILS, *ARGV 这边大致上可以看出端倪了，这行代码的实质是：</p>
+[cc lang="ruby"]
+ruby script/rails [arguments]
+# 这里的arguments 可以是server, generate, console等
+[/cc]
+
+<p>OK，重点来看看script/rails </p>
+首先有一个<strong>APP_PATH</strong>的常量，可以看到指向的是config目录下的application.rb文件。接着require了boot文件和commands文件。这里可以看到boot文件是第一个被载入的。
+<p>boot文件的任务其实很简单，就是准备好Gemfile中的gems。</p><p>
+[cc lang="ruby"]
+# rubygems第一个被加载
+require 'rubygems'
+
+# Set up gems listed in the Gemfile.
+gemfile = File.expand_path('../../Gemfile', __FILE__)
+begin
+    ENV['BUNDLE_GEMFILE'] = gemfile
+    require 'bundler'
+    Bundler.setup
+rescue Bundler::GemNotFound => e
+    STDERR.puts e.message
+    STDERR.puts "Try running `bundle install`."
+    exit!
+end if File.exist?(gemfile)
+
+[/cc]
+
+</p><p>命令行的实质就全在rails/commands.rb中了，源码地址<a href="https://github.com/rails/rails/blob/master/railties/lib/rails/commands.rb">commands.rb</a></p>
+[cc lang="ruby"]
+ARGV < < '--help' if ARGV.empty?
+
+aliases = {
+  "g" => "generate",
+  "c" => "console",
+  "s" => "server",
+  "db" => "dbconsole"
+}
+
+command = ARGV.shift
+command = aliases[command] || command
+
+[/cc]
+<p>可以看到这里的ARGV就是上面提到的exec RUBY, SCRIPT_RAILS, *ARGV后面的参数，也就是我们传进去的"server，generate，console"等等。这里为空就是"--help"，并且还有4个aliases方便简写。</p>
+
+<p>主要还是看server是如何启动的。</p>
+[cc lang="ruby"]
+when 'server'
+  # Change to the application's path if there is no config.ru file in current dir.
+  # This allows us to run script/rails server from other directories, but still get
+  # the main config.ru and properly set the tmp directory.
+  Dir.chdir(File.expand_path('../../', APP_PATH)) unless File.exists?(File.expand_path("config.ru"))
+
+  require 'rails/commands/server'
+  Rails::Server.new.tap { |server|
+    # We need to require application after the server sets environment,
+    # otherwise the --environment option given to the server won't propagate.
+    require APP_PATH
+    Dir.chdir(Rails.application.root)
+    server.start
+  }
+[/cc]
+<p>上面代码有三点，第一是实例化了Rails::server，第二是require APP_PATH（也就是application.rb），第三调用了server#start方法</p>
+<p>实例化了一个Rails::Server，这是个什么东东？参考源码<a href="https://github.com/rails/rails/blob/master/railties/lib/rails/commands/server.rb">commands/server.rb</a></p>
+[cc lang="ruby"]
+require 'fileutils'
+require 'optparse'
+require 'action_dispatch'
+
+module Rails
+  class Server < ::Rack::Server
+    ......
+  end
+end
+[/cc]
+<p>原来Rails::Server继承了Rack::Server（终于和Rack挂钩了），Rack::Server用来给所有基于rack的应用提供一般的server接口。而且，这里第一次引入了action_dispatch。Rails::Server的initialize方法如下：
+[cc lang="ruby"]
+def initialize(*)
+      super
+      set_environment
+end
+[/cc]
+<strong>super</strong>，<a href="https://github.com/rack/rack/blob/master/lib/rack/server.rb">Rack::Server源码</a>那么Rack::Server的initialize方法如下：
+[cc lang="ruby"]
+def initialize(options = nil)
+      @options = options
+      @app = options[:app] if options && options[:app]
+end
+[/cc]
+由于options为nil所以Rack::Server中的initialize无作为，回到Rails::Server中，super的下一句是set_environment，代码如下：
+[cc lang="ruby"]
+def set_environment
+      ENV["RAILS_ENV"] ||= options[:environment]
+end
+[/cc]
+<p>一目了然，设定环境咯，production，development，还是test。这里options是父类Rack::Server中的：</p>
+[cc lang="ruby"]
+def options
+      @options ||= parse_options(ARGV)
+end
+
+def parse_options(args)
+    options = default_options
+
+    # Don't evaluate CGI ISINDEX parameters.
+    # http://hoohoo.ncsa.uiuc.edu/cgi/cl.html
+    args.clear if ENV.include?("REQUEST_METHOD")
+
+    options.merge! opt_parser.parse! args
+    options[:config] = ::File.expand_path(options[:config])
+    ENV["RACK_ENV"] = options[:environment]
+    options
+end
+[/cc]
+<p>default_options在Rails::Server中被覆写了：</p>
+[cc lang="ruby"]
+def default_options
+      super.merge({
+        :Port => 3000,
+        :environment => (ENV['RAILS_ENV'] || "development").dup,
+        :daemonize => false,
+        :debugger => false,
+        :pid => File.expand_path("tmp/pids/server.pid"),
+        :config => File.expand_path("config.ru") # config.ru被指定，这也是commands.rb中server要chdir项目根目录的原因。
+      })
+end
+[/cc]
+
+<p>第二是require APP_PATH（也就是application.rb），其实就是将项目的application给配置好，里面有这么一句：</p>
+[cc lang="ruby"]
+require 'rails/all'
+[/cc]
+其实就是将rails所有的模块都引入进来，all.rb如下：
+[cc lang="ruby"]
+require "rails"
+ 
+  %w(
+    active_record
+    action_controller
+    action_mailer
+    active_resource
+    rails/test_unit
+  ).each do |framework|
+    begin
+      require "#{framework}/railtie"
+    rescue LoadError
+    end
+  end
+[/cc]
+
+<p>第三是调用了server#start方法，在Rails::Server中：</p>
+[cc lang="ruby"]
+def start
+      puts "=> Booting #{ActiveSupport::Inflector.demodulize(server)}"
+      puts "=> Rails #{Rails.version} application starting in #{Rails.env} on http://#{options[:Host]}:#{options[:Port]}"
+      puts "=> Call with -d to detach" unless options[:daemonize]
+      trap(:INT) { exit }
+      puts "=> Ctrl-C to shutdown server" unless options[:daemonize]
+
+      #Create required tmp directories if not found
+      %w(cache pids sessions sockets).each do |dir_to_make|
+        FileUtils.mkdir_p(Rails.root.join('tmp', dir_to_make))
+      end
+
+      super
+    ensure
+      # The '-h' option calls exit before @options is set.
+      # If we call 'options' with it unset, we get double help banners.
+      puts 'Exiting' unless @options && options[:daemonize]
+    end
+[/cc]
+<p>多熟悉啊，先一步步的屏显。然后是trap(:INT) { exit }，是响应Ctrl-C中断的。再创建了tmp文件夹和四个子文件夹，最后回到Rack::Server的start方法中。</p>
+<p>Rack::Server的start方法有这么一句：</p>
+[cc lang="ruby"]
+wrapped_app
+[/cc]
+实际调用的是：
+[cc lang="ruby"]
+def wrapped_app
+    @wrapped_app ||= build_app app
+end
+[/cc]
+这里有两个方法的调用，一个是#build_app，另一个是#app，先来看#app方法：
+[cc lang="ruby"]
+def app
+      @app ||= begin
+        if !::File.exist? options[:config]
+          abort "configuration #{options[:config]} not found"
+        end
+
+        app, options = Rack::Builder.parse_file(self.options[:config], opt_parser)
+        self.options.merge! options
+        app
+      end
+end
+[/cc]
+<p>了然了，原来通过Rack::Builder和config.ru构建了一个Rack application啊.<a href="https://github.com/rack/rack/blob/master/lib/rack/builder.rb">Rack::Builder源码</a></p>
+<p>再来看#build_app方法：</p>
+[cc lang="ruby"]
+def build_app(app)
+  middleware[options[:environment]].reverse_each do |middleware|
+    middleware = middleware.call(self) if middleware.respond_to?(:call)
+    next unless middleware
+    klass = middleware.shift
+    app = klass.new(app, *middleware)
+  end
+  app
+end
+[/cc]
+<p>通过middleware来新建一个app，像剥洋葱一样，一个一个middleware的往外套。</p>
+<p>ok，由上面我们知道，通过config.ru，我们创建了一个Rack Application，下面来看看config.ru</p>
+[cc lang="ruby"]
+# This file is used by Rack-based servers to start the application.
+
+require ::File.expand_path('../config/environment',  __FILE__)
+run example::Application
+[/cc]
+<p>可以看到引入了environment.rb文件。如下：</p>
+[cc lang="ruby"]
+# Load the rails application
+require File.expand_path('../application', __FILE__)
+
+# Initialize the rails application
+example::Application.initialize!
+[/cc]
+<p>初始化了example::Application，example::Application是继承的Rails::Application，那么Rails::Application是什么呢？</p>
+
+<blockquote>  
+  #Rails::Application is responsible for executing all railties, engines and plugin
+  # initializers. Besides, it also executed some bootstrap initializers (check
+  # Rails::Application::Bootstrap) and finishing initializers, after all the others
+  # are executed (check Rails::Application::Finisher).</blockquote>
+<p>通过<a href="https://github.com/rails/rails/blob/master/railties/lib/rails/application.rb">代码</a>，Rails::Application继承了Engine。</p>
+<p>看看initialize!方法：</p>
+[cc lang="ruby"]
+def initialize!
+  raise "Application has been already initialized." if @initialized
+  run_initializers(self)
+  @initialized = true
+  self
+end
+[/cc]
+
+<p><strong>至此，Rails Application的初始化和Rails Server基本上都已经启动完成。</strong></p>
+
+3）<strong>rails是如何响应一个请求的?
+占座，等下一篇文章完成后链接到这里。</strong>

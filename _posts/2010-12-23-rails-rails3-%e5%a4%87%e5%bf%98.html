@@ -1,0 +1,91 @@
+--- 
+layout: post
+title: "rails rails3 \xE5\xA4\x87\xE5\xBF\x98"
+tags: 
+- deprecated
+- rails3
+- Ruby&amp;Rails
+- "\xE5\xA4\x87\xE5\xBF\x98"
+status: publish
+type: post
+published: true
+meta: 
+  _edit_lock: "1297817172"
+  _edit_last: "1"
+  _wp_old_slug: rails3-%e5%a4%87%e5%bf%98
+  _oembed_f502efe6e35498ef6219eb13abbbf35a: "{{unknown}}"
+  dsq_thread_id: "245120442"
+---
+<p>有些东西可能看起来很简单，并且可能确实很简单。下面都是在实际过程中遇到过的问题，好记性不如烂笔头，花几分钟记下来，何乐不为呢？</p>
+
+1）rails3  deprecated的方法
+[cc lang="ruby"]
+# 前面是不推荐的做法
+save(false) == save(:validate => false)
+[/cc] 
+2）strip_links(html)和strip_tags(html)
+[cc lang="ruby"]
+strip_links('<a href="http://www.rubyonrails.org">Ruby on Rails</a>')
+# => Ruby on Rails
+strip_tags("Strip <i>these</i> tags!")
+# => Strip these tags!
+[/cc]
+3）实例变量和类变量
+<p>详见，<a href="http://zires.info/2011/01/04/ruby-class_variables-and-instance_variables/"> 实例变量和类变量的区别 </a><br /></p>
+4）引入FileUtils模块
+[cc lang="ruby"]
+require 'fileutils.rb'
+include FileUtils
+[/cc]
+5）动态创建方法（dynamically define method）
+http://ruby.dzone.com/news/dynamically-created-methods-ru
+6）某一个action只想完成自己的事，而不渲染页面
+[cc lang="ruby"]
+render :nothing => true
+# 只返回200状态码
+[/cc]
+7）文件上传如何测试，我们知道，单单给出文件的磁盘地址是不够的，幸好rails有<strong>fixture_file_upload</strong>来模拟一个文件上传的路径
+[cc lang="ruby"]
+# 2.x版本在spec_helper.rb文件中增加
+include ActionController::TestProcess
+# rails3 版本在 spec_helper.rb文件中增加
+include ActionDispatch::TestProcess
+
+Image.new(:attachment => fixture_file_upload('/home/zires/guan1.gif', 'image/gif'))
+
+[/cc]
+8）大文件的下载，当我们的下载文件不在public下（不是所有人都能访问的时候）,send_file解决了这个问题
+[cc lang="ruby"]
+before_filter :login_required
+def download
+    send_file '/home/railsway/downloads/huge.zip', :type=>"application/zip", :x_sendfile=>true
+end
+# x_sendfile 参数确保了Lighttpd/Apache2服务器下，只占用很少的内存，并且不会堵塞其他的请求
+
+[/cc]
+9）rails3中不 escape tags
+[cc lang="ruby"]
+< %=raw @user.post %>
+[/cc]
+10）Gemfile 中指定branch tag ref
+[cc lang="ruby"]
+gem 'xxxxx',
+        :git => 'git://github.com/xx.git',
+        :branch => 'xx',
+        :tag => 'xxxxx',
+        :ref => 'xxxx'
+[/cc]
+11）String#constantize 和 Object#const_get
+在元编程的时候，有时需要动态生成method，如何把一个字符串转成类呢？例如option_type转成OptionType，并且能响应find方法。
+[cc lang="ruby"]
+"option_type".camelize #=> "OptionType"
+"option_type".camelize.constantize #=> OptionType
+"option_type".camelize.constantize.send(:find, 1)
+
+# or
+class String
+  def to_class
+    Object.const_get(self)
+  end
+end
+[/cc]

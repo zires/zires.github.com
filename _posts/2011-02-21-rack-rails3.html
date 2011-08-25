@@ -1,0 +1,116 @@
+--- 
+layout: post
+title: rack rails3
+tags: 
+- rack
+- rails3
+- Ruby&amp;Rails
+status: publish
+type: post
+published: true
+meta: 
+  _edit_lock: "1298298858"
+  _edit_last: "1"
+  _wp_old_slug: ""
+  dsq_thread_id: "245499780"
+---
+简单提下rack
+<p>1）要求</p>
+一个rack应用程序要满足三个条件，a）响应call方法，b）call方法要有一个env环境参数，c）方法返回一个数组，数组包括三个部分，状态码，header和body
+<p>2）简单的rack</p>
+[cc lang="ruby"]
+require 'rubygems'
+require 'rack'
+
+Rack::Handler::WEBrick.run lambda{ |env| [200,{},["hello rack!"]]}, :Port => 3000
+[/cc]
+<p>3）使用中间件</p>
+Rack的中间件会一层层的封装rack应用程序，Rack中间件也是一个rack应用程序，新建一个最简单的中间件：
+[cc lang="ruby"]
+class SomeMiddleware
+  def initialize(app)
+    @app = app
+  end
+
+  def call(env)
+    # 对@app做处理最后再返回一个符合rack标准的数组
+    [status, headers, body]
+  end
+end
+
+# 使用
+Rack::Handler::WEBrick.run SomeMiddleware.new(app), :Port => 3000
+[/cc]
+<p>4）使用Rack::Builder</p>
+Rack::Builder是rack的DSL，以更优雅的方式来打造一个rack应用程序。
+[cc lang="ruby"]
+app = Rack::Builder.new {
+  use Rack::ContentLength
+  use SomeMiddleware
+  run SomeRackApp.new
+}
+# 或者直接用lambad
+app = Rack::Builder.app do
+  use Rack::ContentLength
+  use SomeMiddleware
+  lambda { |env| [200, {'Content-Type' => 'text/plain'}, 'OK'] }
+end
+
+# 使用
+Rack::Handler::WEBrick.run app, :Port => 3000
+[/cc]
+<p>5）使用rackup和config.ru</p>
+rackup让我们可以使用一个配置文件来运行Rack应用程序。
+[cc lang="ruby"]
+rackup -s thin -p 3000 [config.ru]
+[/cc]
+config.ru的内容就和Rack::Builder差不多了。
+[cc lang="ruby"]
+use Rack::ContentLength
+use SomeMiddleware
+lambda { |env| [200, {'Content-Type' => 'text/plain'}, 'OK'] }
+[/cc]
+Rackup的实现其实就是Rack::Server.start，start方法最重要的一句：
+[cc lang="ruby"]
+app, options = Rack::Builder.parse_file(self.options[:config], opt_parser)
+[/cc]
+还是Rack::Builder吧，一目了然。
+
+<blockquote><p><strong>Rails3 on Rack</strong></p></blockquote>
+如果看过rails的启动过程，我们知道，rails server 其实是调用了Rails::Server.new#start方法，也就是Rack::Server的start方法。也就是用Rack::Builder读取了config.ru文件，把整个Rails Application跑了起来。
+[cc lang="ruby"]
+MyOwnApp::Application.initialize!
+run MyOwnApp::Application
+[/cc]
+<p>这里有个继承关系要知道：</p>
+[cc]
+MyOwnApp::Application < Rails::Application < Rails::Engine < Rails::Railtie
+[/cc]
+<p>整个rails3程序可以说是一个大的rack应用程序，里面每个中间件又都是一个rack应用程序，到每一个action又是一个rack应用程序，所以rails3和rack是密不可分的。
+<p>可以用rack middleware看看一共使用了多少middleware</p>
+[cc]
+use ActionDispatch::Static
+use Rack::Lock
+use ActiveSupport::Cache::Strategy::LocalCache
+use Rack::Runtime
+use Rails::Rack::Logger
+use ActionDispatch::ShowExceptions
+use ActionDispatch::RemoteIp
+use Rack::Sendfile
+use ActionDispatch::Callbacks
+use ActiveRecord::ConnectionAdapters::ConnectionManagement
+use ActiveRecord::QueryCache
+use ActionDispatch::Cookies
+use ActionDispatch::Session::CookieStore
+use ActionDispatch::Flash
+use ActionDispatch::ParamsParser
+use Rack::MethodOverride
+use ActionDispatch::Head
+use ActionDispatch::BestStandardsSupport
+use Warden::Manager
+use Sass::Plugin::Rack
+run MyOwnApp::Application.routes
+
+[/cc]
+
+这里有篇railscasts讲如何将Sinatra和Rails结合起来，理论上任何符合Rack规则的框架都可以和Rails结合。<a href="http://railscasts.com/episodes/222-rack-in-rails-3">rack-in-rails-3</a>

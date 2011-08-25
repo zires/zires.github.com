@@ -1,0 +1,77 @@
+--- 
+layout: post
+title: rails3 application add subdomain
+tags: 
+- rails3
+- Ruby&amp;Rails
+- subdomain
+status: publish
+type: post
+published: true
+meta: 
+  _edit_lock: "1312696243"
+  _edit_last: "1"
+  _syntaxhighlighter_encoded: "1"
+  _wp_old_slug: ""
+  _oembed_265428cfe2da3af92ee179e265edb989: "{{unknown}}"
+---
+在rails3项目中配置subdomain。假设我们有个网站www.zires.info。我想把www.zires.info/photos变成子域名的形式www.photos.zires.info。
+
+<strong>第一步：配置路由</strong>
+[ruby title="routes.rb"]
+constraints(:subdomain=&gt;&quot;photos&quot;) do
+  root :to =&gt; &quot;photos#index&quot;
+end
+[/ruby]
+至此，访问photos.zires.info就会到photos的index页面。但是www.photo.zires.info就不对了，所以还需要对www进行过滤。
+
+<strong>第二步：过滤"www"</strong>
+
+创建一个subdomain.rb文件在项目的initializers中
+[ruby title="config/initializers/subdomain.rb"]
+class Subdomain
+  def self.matches?(request)
+    request.subdomain.present? and request.subdomain == 'photos'
+  end
+end
+[/ruby]
+
+[ruby title="routes.rb"]
+constraints(Subdomain) do
+  root :to =&gt; &quot;photos#index&quot;
+end
+[/ruby]
+这样路由就配置好了。
+
+<strong>第三步：修改UrlHelper</strong>
+
+我们还需要在url_for中增加一个subdomain参数，这样就可以指定url是在哪个域名下面了。
+[ruby title="app/helpers/url_helper.rb"]
+module UrlHelper
+ 
+  def url_for(options =nil)
+     if options.kind_of?(Hash) and options.has_key?(:subdomain)
+       options[:host] = with_subdomain(options.delete(:subdomain))
+     end
+     super
+  end
+
+  def with_subdomain(subdomain=&quot;&quot;)
+    subdomain += &quot;.&quot; unless subdomain.empty?
+    [subdomain, request.domain].join
+  end
+
+end
+[/ruby]
+
+<strong>第四步：session共享</strong>
+
+但是发现session不能在domain和subdomain之间共享，需要指定下
+[ruby title="config/initializers/session_store.rb"]
+Zires::Application.config.session_store :cookie_store, key: '_zires_session', domain: '.zires.info'
+[/ruby]
+
+重启下就完成了。
+
+<blockquote>参考链接：
+http://asciicasts.com/episodes/221-subdomains-in-rails-3</blockquote>

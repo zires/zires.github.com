@@ -1,0 +1,49 @@
+--- 
+layout: post
+title: "fcgi\xEF\xBC\x8Cscgi\xEF\xBC\x8Cwsgi\xEF\xBC\x8Ccgi"
+tags: 
+- cgi
+- fcgi
+- Ruby&amp;Rails
+- scgi
+- wsgi
+status: publish
+type: post
+published: true
+meta: 
+  _edit_lock: "1295165423"
+  _edit_last: "1"
+  dsq_thread_id: "246604621"
+---
+<p>我常常想，web开发的本质是什么？站在最终用户的角度，无非就是用浏览器将网页显示出来。网页又是什么？其实就是HTML。HTML是什么？其实就是浏览器认识的语言，例如，通过HTML告诉浏览器这边我需要一个链接（a标签），那么我们就能看到一段链接。如果只是单纯的静态页面，就像广告那样纯粹的显示，那么可能根本用不着java，ruby等语言，HTML就够了。</p>
+<p><strong>CGI</strong>是什么？</p>
+Common Gate Interface的简称，通用网关接口。是一段跑在服务器上的程序，用来处理用户请求的。
+<p>为嘛要CGI？</p>
+现在的网页远远不像静态页面那么简单，我们常常要拿到用户的输入，然后再返回相应的页面，所以在服务器端的程序必须有能动态的生成HTML的能力。CGI既然是接口，接的也就是服务器和客户端。当然了，理论上，任何有输入输出能力的语言都可以用来写CGI。
+<p>简单的CGI例子：</p>
+第一步，配置Apache：
+CGI当然不是随便就能跑的，当然要在服务器上做一些设置了。配置也很简单。
+1）首先确定安装了apache2
+2）默认的cgi-bin目录在/usr/lib/下，在里面用perl写一段代码，保存为hw.pl，具体可以看<a href="http://man.chinaunix.net/newsoft/ApacheManual/howto/cgi.html">Apache官方文档</a>
+[cc lang="perl"]
+#! /usr/bin/perl
+print "Content-type: text/html\n\n";
+print "<a href='www.google.com'>Hello, World.</a>"; 
+[/cc]
+3）可能的话要给该文件hw.pl加上chmod a+x 可执行的权限。
+4）访问http://localhost/cgi-bin/hw.pl 就可以看见标准的"Hello，World."链接了。
+
+<p><strong>FCGI又是什么？</strong></p>
+FCGI全称是FastCGI，顾名思义，就是比CGI快，<a href="http://baike.baidu.com/view/641394.html">fcgi的百度百科</a>。FCGI和CGI都是语言无关的，FCGI以多消耗内存来换取速度。
+
+<p><strong>SCGI是什么？</strong></p>
+其实这些都是为了更好的取代CGI的功能，SCGI全称Simple Common Gateway Interface。顾名思义，这个就是简单咯。scgi也是客户端/服务器端形式，客户端发送请求，处理，服务器端响应请求。简而言之，SCGI定义了发送或者响应报文形式的协议。也是和语言无关的。
+
+<p><strong>WSCGI是什么？</strong></p>
+WSGI全称Web Server Gateway Interface。WSGI是python特有的，不过只要实现了他的协议，WSGI也可以跑在任何服务器上。另外ruby中的Rack也借鉴了WSGI。
+
+其实具体协议的内容没必要探究，只需要知道他们处理的问题是什么就够了。
+一些链接
+<a href="http://stackoverflow.com/questions/219110/how-python-web-frameworks-wsgi-and-cgi-fit-together">how-python-web-frameworks-wsgi-and-cgi-fit-together</a>
+<a href="http://stackoverflow.com/questions/1747266/is-there-a-speed-difference-between-wsgi-and-fcgi">is-there-a-speed-difference-between-wsgi-and-fcgi</a>
+<a href="http://stackoverflow.com/questions/257481/whats-the-difference-between-scgi-and-wsgi">whats-the-difference-between-scgi-and-wsgi</a>

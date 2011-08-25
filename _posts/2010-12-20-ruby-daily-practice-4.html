@@ -1,0 +1,43 @@
+--- 
+layout: post
+title: ruby daily practice 4
+tags: 
+- Ruby&amp;Rails
+- "\xE9\x9D\xA2\xE8\xAF\x95\xE9\xA2\x98"
+status: publish
+type: post
+published: true
+meta: 
+  _edit_last: "1"
+  _edit_lock: "1292777687"
+  _syntaxhighlighter_encoded: "1"
+  _wp_old_slug: ""
+  dsq_thread_id: "257037031"
+---
+<blockquote>给定能随机生成整数1到5的函数，写出能随机生成整数1到7的函数</blockquote>
+我的想法：一个函数已经可以生成1到5的随机数了，那么只要在它的返回值，6，7中再随机返回一个，就是随机生成1到7的函数了。
+题解：<span style="color: #0e13f0;">这道题目的关键是让生成的 1 到 7 的数出现概率相同</span>。
+总结：我又想简单了:&lt; ，按照我原先的想法，6，7的概率明显要高于1到5，所以这道题关键是如何将1到5等概率的放大。
+
+解法1：
+[cc lang="ruby"]
+# n 个数中随机选出 1 到 n 个数，反复进行这种运算，直到剩下最后一个数即可
+# 例如 
+arr = [1,2,3,4,5,6,7]
+rand5 # => 返回1到5中任意一个数字
+# 反复7次rand5函数得到一个数组
+# 
+b = [3, 4, 4, 4, 2]
+
+# arr 去除b中有的元素
+c = arr -b # => [1,5,6,7]
+# 这里c已经小于5了
+# 下面可以自定义取值规则，但必须通过rand5函数
+# 例如我们规定取调用rand5，最小值的位置
+# 四次
+d = [4,2,4,3] 
+# 最小值是2，位置是1，为什么这里可以这样呢？
+# 因为在d中每个位置出现最小值的概率是一样的
+所以最后的返回值为
+c.at(1) #=> 5
+[/cc] 

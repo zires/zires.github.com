@@ -1,0 +1,126 @@
+--- 
+layout: post
+title: rails2.3.5 devise bundler install
+tags: 
+- devise
+- rails2.3.5
+- Ruby&amp;Rails
+status: publish
+type: post
+published: true
+meta: 
+  _edit_lock: "1311217783"
+  _edit_last: "1"
+---
+使用bundler在rails2.3.5项目中安装devise.
+
+我的环境参数：
+[cc]
+ruby 1.8.7-head
+rails 2.3.5
+[/cc]
+
+<strong><em style="color: blue;">STEP1  生成一个Rails2.3.5项目，名为blog</em></strong>
+[cc]
+rails blog -d mysql
+[/cc]
+
+<strong><em style="color: blue;">STEP2  安装和配置bundler</em></strong>
+Bundler是rails3默认的gem包依赖管理工具，没有它真的很不方便，rails2.3.5也可以使用，<a href="http://gembundler.com/rails23.html" target="_blank">官方安装说明</a>.
+
+首先：
+[cc]
+gem install bundler
+[/cc]
+
+然后在刚刚生成的blog项目的<strong>config/boot.rb</strong>文件的<em style="color: red;">最后</em>加上如下的代码：
+<script src="https://gist.github.com/1095359.js?file=boot.rb"></script>
+
+接着在config目录下新建一个文件叫preinitializer.rb，写入下面的代码：
+<script src="https://gist.github.com/1095360.js?file=preinitializer.rb"></script>
+
+最后在blog的根目录下创建文件Gemfile，如果是windows平台注意没有后缀名。这样我们就可以在rails2.3.5项目中使用bundler了.
+
+<strong><em style="color: blue;">STEP3  安装devise</em></strong>
+有了第二步安装的bundler，就简单多了.
+在刚刚新建的Gemfile文件中加入devise，代码如下：
+[cc lang="ruby"]
+source :gemcutter
+
+gem "rails", "2.3.5"
+gem "devise", "1.0.10"
+gem "mysql"
+[/cc]
+
+在blog根目录下运行命令：
+[cc]
+bundle install
+[/cc]
+
+<strong><em style="color: blue;">STEP4  简单使用devise</em></strong>
+<em style="color:red;">先记得在config/database.yml中配置好数据库</em>.
+运行命令建立数据库：
+[cc]
+rake db:create RAILS_ENV=development
+[/cc]
+
+在blog根目录下运行命令：
+[cc]
+ruby script/generate devise_install
+[/cc]
+
+接着新建User用户，还是在blog根目录下运行：
+[cc]
+ruby script/generate devise User
+[/cc]
+
+接着：
+[cc]
+rake db:migrate
+[/cc]
+
+ok。到目前为止，devise已经安装配置好了，下面测试下是否成功。
+
+<strong><em style="color: blue;">STEP5  测试devise</em></strong>
+我们的blog需要一个首页用来展示。
+先删除public目录下的index.html文件。
+运行命令，新建一个controller：
+[cc]
+ruby script/generate controller homepage index
+[/cc]
+
+配置路由，在config/routes.rb中加入：
+[cc lang="ruby"]
+map.root :controller => "homepage"
+[/cc]
+
+在views/homepage/index.html.erb中加入：
+[cc lang="html"]
+<ul class="hmenu">
+  < % if user_signed_in? %>
+    <li>
+    < %= link_to('Logout', destroy_user_session_path, :method => 'delete') %>        
+    </li>
+  < % else %>
+    <li>
+    < %= link_to('Login', new_user_session_path)  %>  
+    </li>
+  < % end %>
+  < % if user_signed_in? %>
+    <li>
+    < %= link_to('Edit registration', edit_user_registration_path) %>
+    </li>
+  < % else %>
+    <li>
+    < %= link_to('Register', new_user_registration_path)  %>
+    </li>
+  < % end %>
+</ul>
+[/cc]
+
+最后启动服务：
+[cc]
+ruby script/server
+[/cc]
+
+ok！到这里应该就可以看见首页上有登录和注册的链接了。

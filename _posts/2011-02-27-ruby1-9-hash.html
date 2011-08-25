@@ -1,0 +1,67 @@
+--- 
+layout: post
+title: ruby1.9 hash
+tags: 
+- hash
+- Ruby&amp;Rails
+- ruby1.9
+status: publish
+type: post
+published: true
+meta: 
+  _edit_last: "1"
+  _edit_lock: "1298783967"
+  _wp_old_slug: ""
+  dsq_thread_id: "253981273"
+---
+<strong>Hash有序</strong>
+Ruby1.8：
+[cc lang="ruby"]
+ruby-1.8.7-p299 > h = {}
+ => {} 
+ruby-1.8.7-p299 > h[1] = 1
+ => 1 
+ruby-1.8.7-p299 > h
+ => {1=>1} 
+ruby-1.8.7-p299 > h[0] = 1
+ => 1 
+ruby-1.8.7-p299 > h
+ => {0=>1, 1=>1} 
+[/cc]
+Ruby1.9
+[cc lang="ruby"]
+irb(main):001:0> RUBY_VERSION
+=> "1.9.3"
+irb(main):002:0> h = {}
+=> {}
+irb(main):003:0> h[1] = 1
+=> 1
+irb(main):004:0> h[0] = 0
+=> 0
+irb(main):005:0> h
+=> {1=>1, 0=>0}
+irb(main):006:0> 
+[/cc]
+
+<p><strong>类似json的写法：</strong></p>
+ruby1.8不支持
+ruby1.9：
+[cc lang="ruby"]
+irb(main):001:0> RUBY_VERSION
+=> "1.9.3"
+irb(main):002:0> {a: 1}
+=> {:a=>1}
+irb(main):003:0> {a_b: 1}
+=> {:a_b=>1}
+irb(main):004:0> {a-b: 1}
+SyntaxError: (irb):3: syntax error, unexpected tLABEL
+irb(main):005:0> {"a": 1}
+SyntaxError: (irb):4: syntax error, unexpected ':', expecting tASSOC
+
+[/cc]
+
+<blockquote>参考链接</blockquote>
+
+<a href="http://www.igvita.com/2009/02/04/ruby-19-internals-ordered-hash/">ruby-19-internals-ordered-hash/</a>
+<a href="http://www.oreillynet.com/ruby/blog/2007/06/on_the_horizon_ten_things_i_li.html">on_the_horizon_ten_things_i_li.html</a>
+<a href="http://stackoverflow.com/questions/2134702/ruby-1-9-hash-with-a-dash-in-a-key">ruby-1-9-hash-with-a-dash-in-a-key</a>

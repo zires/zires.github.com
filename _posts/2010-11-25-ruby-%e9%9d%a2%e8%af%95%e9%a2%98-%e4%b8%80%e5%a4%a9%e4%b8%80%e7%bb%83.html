@@ -1,0 +1,76 @@
+--- 
+layout: post
+title: ruby daily practice 1
+tags: 
+- Ruby&amp;Rails
+- "\xE9\x9D\xA2\xE8\xAF\x95\xE9\xA2\x98"
+status: publish
+type: post
+published: true
+meta: 
+  _edit_lock: "1292776275"
+  _edit_last: "1"
+  _wp_old_slug: ""
+  _syntaxhighlighter_encoded: "1"
+---
+<blockquote>题目：在排序数组中，找出给定数字的出现次数，比如 [1, 2, 2, 2, 3] 中2的出现次数是3次。</blockquote>
+最简单的方法
+[cc lang="ruby"]
+# 给定数组
+arr = [2，2，4，6，9，8，3，6，2，4，6，9]
+
+# 使用count函数
+arr.count(2)  #=&gt; 3
+
+arr.count(1)  #=&gt; 0
+[/cc]
+So Easy 
+
+不过题目不会考你api方法的，考的应该是算法
+二分搜索查找，时间复杂度O(log n)。
+[cc lang="ruby"]
+# 给Array添加新的instance_method
+class Array
+ def new_count(num, need_sort = true )
+ # 初始为0
+ count = 0
+ return count if empty?
+ # 排序  只有第一次需要
+ sort_arr = need_sort ? self.sort : self		
+ index = sort_arr.length/2
+ last_index = sort_arr.length - 1
+ # 取得中间的数			
+ middle = sort_arr.at(index)
+ if middle == num
+   # 因为匹配成功才扫描，所以肯定有一个存在
+   count = 1			
+   # 向前扫描			
+   (index -1).downto(0) do |idx|
+     if sort_arr.at(idx) == num
+	count += 1
+     else
+        break
+     end
+   end
+   # 向后扫描
+   (index + 1).upto(last_index) do |idx|
+	if sort_arr.at(idx) == num
+	    count += 1
+	else
+	   break
+	 end
+    end
+  elsif middle &gt; num
+	sort_arr[0..(index -1)].new_count(num,false)
+  elsif middle &lt; num
+	sort_arr[(index + 1)..(last_index - 1)].new_count(num,false)			
+  end
+	return count
+  end
+end
+
+# 测试
+[1,4,4,3,4,4,4].new_count(3) # =&gt; 1
+[1,4,4,3,4,2,4].new_count(4) # =&gt; 4
+[/cc]
+

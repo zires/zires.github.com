@@ -1,0 +1,80 @@
+--- 
+layout: post
+title: rails3 respond_with
+tags: 
+- rails3
+- respond_with
+- Ruby&amp;Rails
+status: publish
+type: post
+published: true
+meta: 
+  _edit_last: "1"
+  _edit_lock: "1309177557"
+  _wp_old_slug: ""
+  dsq_thread_id: ""
+---
+rails3有个新的controller跳转方法叫respond_with，rails总是不忘自己的哲学-“不要重复自己”，在rails2.x的版本中，下面的写法比较常见：
+[cc lang="ruby"]
+class PostsController < ApplicationController::Base
+
+  def index
+    @posts = Post.all
+    respond_to do |format|
+      format.html
+      format.xml { render :xml => @posts.to_xml }
+      format.json { render :json => @posts.to_json }
+    end
+  end
+
+  def create
+    @post = Post.create(params[:post])
+    respond_to do |format|
+      format.html { redirect_to posts_url }
+      format.xml { render :xml => @post.to_xml }
+      format.json { render :json => @post.to_json }
+    end
+  end
+end
+[/cc]
+又臭又长，有了respond_with，就变成如下了：
+[cc lang="ruby"]
+class PostsController < ApplicationController::Base
+
+  respond_to :html, :xml, :json
+
+  def index
+    respond_with(@posts = Post.all)
+  end
+
+  def create
+    @post = Post.create(params[:post])
+    respond_with(@post)
+  end
+end
+
+[/cc]
+多清爽啊，respond_with会根据请求的类型，自动的返回html，xml，或者json。当然了，respond_with也可以override来调整到需要的。
+1）status，head
+[cc lang="ruby"]
+  respond_with(@posts = Post.all, :status => 200, :head => :ok)
+[/cc]
+
+2）override
+[cc lang="ruby"]
+respond_with(@posts) do |format|
+    format.html { redirect_to posts_url }
+end
+[/cc]
+
+3）any，匹配任意的格式
+[cc lang="ruby"]
+respond_with(@posts) do |format|
+    format.any(:xml, :json) { redirect_to posts_url }
+end
+[/cc]
+
+4）:location，类似上面的2 
+[cc lang="ruby"]
+respond_with(@posts, :location => posts_url)
+[/cc] 

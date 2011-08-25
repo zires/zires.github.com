@@ -1,0 +1,35 @@
+--- 
+layout: post
+title: ruby split string two parts
+tags: 
+- core_extension
+- Ruby&amp;Rails
+status: draft
+type: post
+published: false
+meta: 
+  _edit_lock: "1298007313"
+  _edit_last: "1"
+---
+  # return a array [first,last]
+  # split("a:b:c", ":") #=> ["a", "b:c"]
+  # split("a(b(c))", "()") #=> ["a", "b(c)"]
+  # split("abc", ":") #=> ["abc"]
+  # split("abc", "()") #=> ["abc"]
+  def split(str, format)
+    left, right = format.each_char.map
+	  switch = true
+	  result = []
+    sremain = str.each_char.inject([]) do |stack, value|
+		  if switch and value == left
+			  result << stack.join
+			  stack.clear
+			  switch = false
+		  else
+			  stack << value
+		  end
+		  stack
+    end
+	  remain = right.nil? ? remain.join : split(remain.reverse.join, right).last.reverse
+	  result << remain
+  end

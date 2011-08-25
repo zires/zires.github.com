@@ -1,0 +1,65 @@
+--- 
+layout: post
+title: mongoid distinct
+tags: 
+- MongoDB
+- mongoDB
+- mongoid
+- Ruby&amp;Rails
+status: publish
+type: post
+published: true
+meta: 
+  _edit_lock: "1309996039"
+  _edit_last: "1"
+  _wp_old_slug: ""
+---
+MongoDB里面的distinct很简单，就是找出集合中某一个字段的所有不同的值。
+例子，假设如下的users文档：
+[cc]
+{ 
+   "_id" : ObjectId("4df02258aca01b0ce1000005"), 
+   "email" : "xxxxxx@gmail.com", 
+   "name" : "zires", 
+   "sign_in_count" : 3 }
+{ 
+   "_id" : ObjectId("4e149630aca01b0b66000002"), 
+   "email" : "wangshi@gmail.com", 
+   "name" : "wangshi", 
+   "sign_in_count" : 3 }
+{ 
+   "_id" : ObjectId("4e149660aca01b0b66000006"), 
+   "email" : "xixihaha@gmail.com", 
+   "name" : "xixihaha", 
+   "sign_in_count" : 2 }
+[/cc]
+
+在mongo中运行如下shell
+[cc]
+db.runCommand({"distinct" : "users", "key" : "name"})
+[/cc]
+
+结果：
+[cc]
+{
+	"values" : [
+		"zires",
+		"wangshi",
+		"xixihaha"
+	],
+	"stats" : {
+		"n" : 3,
+		"nscanned" : 3,
+		"nscannedObjects" : 3,
+		"timems" : 0
+	},
+	"ok" : 1
+}
+[/cc]
+
+在mongoid中的操作：
+[cc lang="ruby"]
+User.collection.distinct(:name)
+# => ["zires", "wangshi", "xixihaha"]
+[/cc]
+

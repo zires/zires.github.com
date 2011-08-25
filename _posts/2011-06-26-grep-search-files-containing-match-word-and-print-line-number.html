@@ -1,0 +1,24 @@
+--- 
+layout: post
+title: grep search files containing match word and print line number
+tags: 
+- grep
+- Linux
+status: publish
+type: post
+published: true
+meta: 
+  _edit_last: "1"
+  _edit_lock: "1309072450"
+  dsq_thread_id: "342461451"
+---
+Today i want to find some files containing the word 'mongoid' under a directory.
+Try gerp
+[cc]
+grep -rl 'mongoid' config/locales/ --color=auto
+[/cc]
+
+And i need to know the line number.
+[cc]
+grep -orn 'mongoid' config/locales/ --color=auto
+[/cc] 

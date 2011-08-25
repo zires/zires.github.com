@@ -1,0 +1,126 @@
+--- 
+layout: post
+title: rails alias_method_chain rails3
+tags: 
+- alias_method_chain
+- rails
+- rails3
+- Ruby&amp;Rails
+status: publish
+type: post
+published: true
+meta: 
+  _edit_last: "1"
+  _edit_lock: "1293515804"
+  _syntaxhighlighter_encoded: "1"
+  _wp_old_slug: ""
+  dsq_thread_id: "245119885"
+---
+ruby中的alias方法
+[cc lang="ruby"]
+class Foo
+  def hello
+    "Hello"
+   end
+
+  def world
+    "World"
+  end
+
+  alias world hello
+end
+
+Foo.new.hello #=&gt; "Hello"
+Foo.new.world #=&gt; "Hello"
+[/cc]
+看下面这个例子：
+[cc lang="ruby"]
+class Foo
+  def hello
+    "Hello"
+  end
+
+   alias world hello
+
+   def world
+     "World"
+   end
+
+end
+
+Foo.new.hello #=&gt; "Hello"
+Foo.new.world #=&gt; "World"
+[/cc]
+
+ok，下面假设我们要覆写ActiveRecord::Base的find方法，使之接受新的option。假设我们要传入:second，返回第二个record。
+这个时候alias_method_chain就派上用场了。
+[cc lang="ruby"]
+class Foo < ActiveRecord::Base
+class << self
+
+  #先将find方法别名
+  alias find_without_second find
+
+  #再定义find second方法
+  def find_with_second(*args)
+    ......something
+    p "调用find之前"
+   # 调用find_without_second 其实就是find方法
+   find_without_second
+    p "调用find之后"
+  end
+  alias find find_with_second
+end
+end
+# 看看发生了什么
+Foo.find(:second)
+#实际调用find_with_second，在find_with_second方法中，
+#又再调用了find_without_second，也就是原生的find方法了。
+
+[/cc]
+alias_method_chain 其实是一个DSL，合并了两次alias。
+[cc lang="ruby"]
+alias_method_chain :find, :second
+#相当于
+alias find_with_second find
+alias find find_without_second
+
+[/cc]
+
+但是，alias_method_chain有点问题，
+<br />
+<a href="https://rails.lighthouseapp.com/projects/8994-ruby-on-rails/tickets/285-alias_method_chain-limits-extensibility">alias_method_chain limits extensibility</a>
+在rails3 中已经不推荐使用了。
+
+下面我们看看在rails3中如何用<strong>super</strong>关键字来实现上诉功能
+
+[cc lang="ruby"]
+class Foo < ActiveRecord::Base   
+  module FindWithSecond     
+    def find(*args)       
+      p "处理second参数"       
+      super     
+     end
+ end 
+include FindWithSecond end 
+# 测试下 
+Foo.new.find(:second) #=> "处理second参数"
+[/cc]
+可以看到找到的是FindWithSecond中的find的方法，处理完后，通过super再找到父类的find方法。这里其实是用到了ruby的一个特性，就是include模块的先后次序，后include的模块会当成子类来看待。
+[cc lang="ruby"]
+class Foo
+
+module First
+end
+
+module Second
+end
+
+include Second
+include First
+end
+
+#看看Foo的祖先
+Foo.ancestors #=> [Foo, Foo::First, Foo::Second, Object, Kernel]
+#先include的Second当作了First的父类了
+[/cc] 

@@ -1,0 +1,230 @@
+--- 
+layout: post
+title: rails tinymce insert(import) excel using paperclip and roo
+tags: 
+- excel
+- paperclip
+- Roo
+- Ruby&amp;Rails
+- tinymce
+status: publish
+type: post
+published: true
+meta: 
+  _wp_old_slug: ""
+  dsq_thread_id: "251990785"
+  _edit_lock: "1297644554"
+  _edit_last: "1"
+---
+<blockquote>给tinymce增加插入excel的功能。</blockquote>
+
+用到的插件有：
+[cc]
+paperclip  => 用来做excel的上传
+roo => 用来做excel的读取
+jquery.form.js => ajax 表单提交
+[/cc]
+
+Roo 的安装<span style="color:#ff0000;">注意</span>：
+Roo 的包依赖做的不是很好，它的几个依赖包需要指定lib才可以。如果你是rails3.0以下的使用者，在environment.rb中添加以下几行：（rails3同理，只不过加在Gemfile中）
+[cc lang="ruby"]
+config.gem 'libxml-ruby', :lib => 'libxml_ruby'
+config.gem 'rubyzip', :version => '>= 0.9.4', :lib => 'zip/zip'
+config.gem 'spreadsheet', :version => '>= 0.6.4.1'
+config.gem 'google-spreadsheet-ruby', :source => "http://gemcutter.org", :lib => 'google_spreadsheet'
+config.gem 'roo', :version => '>= 1.3.11'
+[/cc]
+
+<p><strong>第一步，新建tiny_mce插件spreadsheet，文件夹结构如下：</strong></p>
+[cc]
+| spreadsheet
+  | img #=>  显示在tiny_mce工具栏上的小图标
+  | js #=> 用到的js文件
+  | langs #=> 多语言
+  editor_plugin.js
+  editor_plugin_src.js
+  spreadsheet.html #=> 弹出的页面
+[/cc]
+<p>editor_plugin_src源代码：</p>
+[cc lang="js"]
+(function(tinymce){
+    tinymce.create('tinymce.plugins.SpreadsheetPlugin', {
+        init: function(ed, url){
+       
+            ed.addCommand('mceSpread', function(){
+                ed.windowManager.open({
+                    file: url + '/spreadsheet.htm',
+                    width: 800,
+                    height: 400,
+                    inline: 1
+                }, {
+                    plugin_url: url
+                });
+            });
+           
+            // Register buttons
+            ed.addButton('spreadsheet', {
+                title: '插入excel表格',
+                        cmd: 'mceSpread',
+                        image: url + '/img/excel.jpg'
+            });
+        },
+    });
+   
+    // Register plugin
+    tinymce.PluginManager.add('spreadsheet', tinymce.plugins.SpreadsheetPlugin);
+})(tinymce);
+[/cc]
+
+<p>spreadsheet.html页面源代码：</p>
+[cc lang="html"]
+< !DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Import Excel</title>
+        <script type="text/javascript" src="../../tiny_mce_popup.js">
+        </script>
+        <script type="text/javascript" src="js/spreadsheet.js">
+        </script>
+        <script type="text/javascript" src="js/jquery-1.4.2.min.js">
+        </script>
+        <script type="text/javascript" src="js/jquery.form.js">
+        </script>
+        <script type="text/javascript">
+            jQuery(function($){
+                $.ajax({
+                    url: "/sheets/uploader",
+                    cache: false,
+                    success: function(html){
+                        $("#spreadsheet").append(html);
+                    }
+                });
+            });
+        </script>
+        <style type='text/css'>
+            a, li {
+                list-style-type: none;
+                text-decoration: none;
+            }
+           
+            .clear {
+                clear: both;
+            }
+           
+            #spreadsheet{
+                margin: 0 auto;
+                overflow:hidden;
+                width:280px;
+            }
+            #sheet_row, #sheet_column{
+                width: 80px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="mceActionPanel">
+            <div id='spreadsheet'>
+            </div>
+        </div>
+    </body>
+</html>
+[/cc]
+<p>最后记得在tiny_mce使用的时候加上spreadsheet插件和spreadsheet的按钮就可以了。</p>
+[cc lang="ruby"]
+uses_tiny_mce :options => {
+        :theme_advanced_buttons2 => %w{spreadsheet},
+        :plugins => %w{spreadsheet}
+      }
+[/cc]
+<p style="color:#0000ff;">OK，现在如果点击插入excel表格按钮，就会找到/sheets/uploader路由，弹出对应的页面。</p>
+
+<p><strong>第二步完成sheet的上传和处理</strong>。</p>
+[cc lang="ruby"]
+require 'roo'
+class Sheet < ActiveRecord::Base
+  has_attached_file :avatar, :path => ":rails_root/tmp/assets/:id/:style/:basename.:extension"
+ 
+  def file_content
+    case suffix
+      when '.ods'
+      handle_exception { Openoffice.new(avatar.path) }
+      when '.xls'
+      handle_exception { Excel.new(avatar.path) }
+      when '.xlsx'
+      handle_exception { Excelx.new(avatar.path) }
+    else
+      return false
+    end
+  end
+ 
+  def handle_exception(&block)
+    begin
+      yield
+    rescue
+      self.errors.add('avatar_content_type',I18n.translate('wrong_type'))
+      self.destroy
+      return false
+    end
+  end
+ 
+  def sheet_name(index)
+    file_content.sheets[index] unless file_content
+  end
+ 
+  def suffix
+    File.extname(self.avatar_file_name)  
+  end
+ 
+  protected
+  def validate_on_create
+    support_file = [".ods",".xls",".xlsx"]
+    errors.add('avatar_content_type',I18n.translate('wrong_type')) unless support_file.include?(suffix)
+  end
+ 
+  def before_destroy
+    self.avatar = nil if !avatar.dirty?
+  end
+end
+[/cc]
+<p>sheets_controller源代码：</p>
+[cc lang="ruby"]
+require 'roo'
+class SheetsController < ApplicationController
+  layout nil
+  after_filter :delete_attachments, :only => :add_sheet
+ 
+  def show
+    @sheet = Sheet.find(params[:id])
+  end
+ 
+  def uploader
+    @sheet = Sheet.new
+  end
+ 
+  def create
+    @sheet = Sheet.new(params[:sheet])
+    if @sheet.save
+      render :action => 'show'
+    else
+      flash.now[:error] = t('wrong_type')
+      render :action => 'uploader'
+    end
+  end
+ 
+  def add_sheet
+    @sheet = Sheet.find(params[:id])
+    @params = params[:sheet]
+    render :partial => "add_sheet", :status => 200
+  end
+ 
+  protected
+  def delete_attachments
+    @sheet.destroy
+  end
+end
+[/cc]
+基本就是这样。
+
+<strong>第三步，剩下的就是一些views，可以通过roo进行一些spreadsheet的数据处理。就不写了。</strong>
+<p style="color:#ff0000;">需要注意的是，这里Roo处理excel时，不能很好的处理excel表格的样式（估计只有在windows平台上调用excel组件才可以处理样式），所以这里只是简单的导入数据，如果需要连同样式原封不动的导入，需要再做许多其他的处理。</p>
+

@@ -1,0 +1,50 @@
+--- 
+layout: post
+title: ruby1.9 regexp match named captures
+tags: 
+- regexp
+- Ruby&amp;Rails
+- ruby1.9
+status: publish
+type: post
+published: true
+meta: 
+  _edit_last: "1"
+  _edit_lock: "1301553758"
+  _wp_old_slug: ""
+  dsq_thread_id: "267332023"
+---
+ruby中的捕获型括号：
+[cc lang="ruby"]
+str = "this is test data"
+str =~ /(da)(ta)/
+
+p $~
+# => #(MatchData "data" 1:"da" 2:"ta")
+p $~.to_a
+# => ["data", "da", "ta"]
+p $1
+# => "da"
+p $2
+# => "ta"
+[/cc]
+
+ruby1.9终于加入了命名捕获，用来取代$1，$2这种可读性很差的方式。
+[cc lang="ruby"]
+p RUBY_VERSION
+#=> "1.9.2"
+
+str = "this is test data"
+/(?<d>da)(?<t>ta)/ =~ str
+
+p d
+#=> "da"
+p t
+#=> "ta"
+
+#***注意顺序***
+str =~ /(?<ddd>da)(ta)/
+
+p ddd
+#=> undefined local variable or method `ddd' for main:Object
+[/cc]</ddd></t></d>

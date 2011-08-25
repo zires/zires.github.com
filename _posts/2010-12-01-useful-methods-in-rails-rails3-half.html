@@ -1,0 +1,195 @@
+--- 
+layout: post
+title: useful methods in rails rails3 half
+tags: 
+- rails
+- rails3
+- Ruby&amp;Rails
+status: publish
+type: post
+published: true
+meta: 
+  _syntaxhighlighter_encoded: "1"
+  _edit_lock: "1293515466"
+  _edit_last: "1"
+  _wp_old_slug: ""
+  dsq_thread_id: "278880265"
+---
+<strong>1）ActiveSupport::OrderedOptions.new</strong>
+其实就是一个hash，但是使用更加OO的方式
+
+[cc lang="ruby"]
+h = ActiveSupport::OrderedOptions.new
+#赋值
+h.boy = "john"
+
+#输出
+h.boy = "john"
+[/cc]
+
+<strong>2）extract_options!</strong>
+是最最常见的方法，作用在于从参数组中抽出hash，参数组哈希分离
+
+[cc lang="ruby"]
+def options(*args)
+  args.extract_options!
+end
+
+options(1, 2)           # => {}
+options(1, 2, :a => :b)  # => {:a=>:b}
+[/cc]
+
+<strong>3）ActiveSupport::Concern</strong>
+这个是非常有用的模块，特别是写插件的时候。在rails3之前，我们给一个类扩展实例方法（instance_methods）和单例方法（class_methods）的方法如下：
+
+[cc lang="ruby"]
+module M
+def self.included(base)
+  base.extend, ClassMethods
+  base.send(:include, InstanceMethods)
+  scope :disabled, where(:disabled => true)
+end
+
+module ClassMethods
+def aa
+  p "我是class_methods"
+end
+...
+end
+
+module InstanceMethods
+def bb
+  p "我是instance_methods"
+end
+...
+end
+end
+
+# 使用
+class Foo
+  include M
+end
+
+# 测试
+foo = Foo.new
+foo.aa #=>NoMethodsFind
+Foo.aa #=> "我是class_methods"
+foo.bb #=>"我是instance_methods"
+[/cc]
+
+在rails3 中如下写：
+
+[cc lang="ruby"]
+require 'active_support/concern'
+module M
+extend ActiveSupport::Concern
+included do
+scope :disabled, where(:disabled => true)
+end
+
+module ClassMethods
+...
+end
+
+module InstanceMethods
+...
+end
+end
+# 剩下的类似
+[/cc]
+
+使用ActiveSupport::Concern还有一个最大的好处是它可以处理include的依赖关系
+
+[cc lang="ruby"]
+require 'active_support/concern'
+module Foo
+extend ActiveSupport::Concern
+included do
+class_eval do
+def self.method_injected_by_foo
+...
+end
+end
+end
+end
+
+module Bar
+extend ActiveSupport::Concern
+include Foo
+
+included do
+self.method_injected_by_foo
+end
+end
+
+class Host
+include Bar # 这边只要include Bar就可以了，而不需要include Foo模块
+end
+
+[/cc]
+
+# 更详细的看代码 <a href="https://github.com/rails/rails/blob/master/activesupport/lib/active_support/concern.rb">concern</a>
+
+<strong>4）delegate </strong>
+<a href="https://github.com/rails/rails/blob/master/activesupport/lib/active_support/core_ext/module/delegation.rb">源码</a>
+代理用在active_record上特别有效，提供了极大的方便。
+
+[cc lang="ruby"]
+class Foo < ActiveRecord::Base
+  def hello
+    "Hello"
+  end
+
+  def world
+    "World"
+  end
+end
+
+class Brr < ActiveRecord::Base
+belongs_to :Foo
+# 使用delegate 将方法a代理给类B
+# 至少代理一个方法,to选项必填
+delegate :hello, :to => :foo
+end
+
+# 测试
+Brr.new.hello # => "Hello"
+Brr.new.world # => NoMethodError
+[/cc]
+
+还可以代理实例变量，类变量，常量，还可以带allow_nil和prefix选项，具体看api文档了。
+
+<strong>5）alias_method_chain和alias_attribute</strong>
+<a href="https://github.com/rails/rails/blob/master/activesupport/lib/active_support/core_ext/module/aliasing.rb">源码</a>
+alias_method_chain算是rails中一个比较重要的方法。具体看这篇文章<a style="color: #ff6600;" href="http://zires.info/2010/12/01/rails-alias_method_chain-rails3/">alias_method_chain_rails3</a>
+alias_attribute 给属性定义别名的，api中的例子：
+
+[cc lang="ruby"]
+class Content < ActiveRecord::Base
+# has a title attribute
+end
+
+class Email < Content
+alias_attribute :subject, :title
+end
+
+e = Email.find(1)
+e.title    # => "Superstars"
+e.subject  # => "Superstars"
+e.subject? # => true
+e.subject = "Megastars"
+e.title    # => "Megastars"
+
+[/cc]
+
+说两点，第一，alias_attribute接受的参数，第一个是new_name，第二个是old_name；
+第二，new_name和old_name捆绑了，一个改变会带动另一个改变，另外alias_attribute会生成四个以new_name为前缀的方法，如下：
+
+[cc lang="ruby"]
+Email.instance_methods(false)
+# => ["_changed?", "_change", "_will_change!", "_was"]
+e.subject_changed? #=> true
+e.subject_change #=> ["", "Megastars"]
+[/cc]
+
+========待续===============

@@ -1,0 +1,208 @@
+--- 
+layout: post
+title: ruby design patterns factory method
+tags: 
+- Ruby&amp;Rails
+- "\xE8\xAE\xBE\xE8\xAE\xA1\xE6\xA8\xA1\xE5\xBC\x8F"
+status: publish
+type: post
+published: true
+meta: 
+  _edit_last: "1"
+  _syntaxhighlighter_encoded: "1"
+  _edit_lock: "1292777873"
+  _wp_old_slug: ""
+  dsq_thread_id: "266440630"
+---
+工厂方法模式：
+<blockquote>it deals with the problem of creating objects (products) without specifying the exact class of object that will be created. The factory method design pattern handles this problem by defining a separate method for creating the objects, which subclasses can then override to specify the derived type of product that will be created.</blockquote>
+工厂方法模式的要点在于，封装创建对象的方法，然后让子类来决定哪一个类被实例化。
+
+YY这样一个场景：假设，有一个mm会天天送我上班，她家里有法拉利汽车和捷安特自行车，早上她会选择其中一个来接我。所以对于我来说，除非第二天我打开门，否则我不会知道她用什么送我，另外，不管她用什么送我，我的目标是按时到公司（半路可能被她拐了）。
+
+<span style="color: #ff0000;">用java实现</span>
+
+[cc lang="java"]
+// 抽象类 交通工具
+public absract class Vehicle{
+  public String name;
+  public void go(){}
+}
+
+// 自行车模型
+public class Bike extends Vehicle{
+  public void go(){
+  //something}
+
+  // 根据路程返回需要的时间
+  public Time countTime(Float miles){}
+}
+
+  // 汽车模新
+public class Car extends Vehicle{
+  public void go(){
+   // something}
+
+  // 根据路程返回需要的时间
+  public Time countTime(Float miles){}
+}
+[/cc]
+
+下面处理上班的事件
+[cc lang="java"]
+// 抽象类 事件
+public absract class Event{
+  // 上班，返回是否迟到
+  public boolean goToWork(Float miles){
+  // factory method
+  Vehicle vehicle = createVehicle();
+  vehicle.go();
+  // 上班需要的时间
+  time = vehicle.countTime(Float miles)
+  // 还可以加其他一些统一的操作
+  // 是否迟到
+  return onTime(time)
+}
+
+  // 计算时间，假设用自行车会迟到，汽车不会
+  public boolean onTime(time){
+     // 具体实现}
+
+  //抽象方法，用来被子类实现
+  protected abstract Vehicle createVehicle();
+}
+
+// 用自行车
+public class UseBikeEvent extends Event{
+   // 创建自行车
+   protected Vehicle createVehicle(){
+      return new Bike();
+    }
+}
+
+// 用汽车
+public class UseCarEvent extends Event{
+   // 创建汽车
+   protected Vehicle createVehicle(){
+      return new Car();
+    }
+}
+[/cc]
+
+OK，下面是mm上场了
+[cc lang="java"]
+public class Mm{
+
+   // 使用一种交通工具
+    public Event use(String name){
+      if(&quot;giant&quot;){
+           UseBikeEvent.new();
+       }elsif(&quot;ferrari&quot;){
+           UseCarEvent.new();
+       }
+     }
+
+      public boolean driveMeToWork(Event event, Float miles){
+          event.goToWork(miles);
+       }
+}
+[/cc]
+下面来测试一下
+[cc lang="java"]
+   public static void main(String args[]){
+        mm = Mm.new();
+        event1 = mm.use(&quot;giant&quot;);
+        mm.driveMeToWork(event1, 360);
+        event2 = mm.use(&quot;ferrari&quot;);
+        mm.driveMeToWork(event2, 360);
+}
+   结果
+   false // 假设自行车会迟到
+   true // 假设汽车不会迟到
+[/cc]
+
+简单说明一下，car和bike都是交通工具的模型，在他们里面不应该出现上班的行为。去上班的行为被放在了Event这个抽象类中，对于Event来说，它并不知道自己究竟用什么交通工具上班，Event负责的是计算时间，判断是否迟到，而具体的实现延迟到了UseCarEvent和UseBikeEvent这两个子类中。其实工厂方法模式在java中最核心的就是“多态”。
+
+<span style="color: #ff6600;">下面来看看ruby是怎么做的</span>
+交通工具的模型没有变化
+[cc lang="ruby"]
+class Vehicle
+  def go ;end
+end
+
+class Car &lt; Vehicle
+    def go;end
+    def count_time(miles);end
+end
+
+class Bike &lt; Vehicle
+    def go;end
+   def count_time(miles);end
+end
+[/cc]
+ruby 没有抽象类，但是有mixi（这里不是说mixi相当于java中的抽象类，两个概念）
+[cc lang="ruby"]
+module Event
+   def create_vehicle;end
+   def go_to_work(miles)
+       vehicle = create_vehicle
+       vehicle.go
+       time = vehicle.count_time(miles)
+       on_time?(time)
+     end
+
+    # 判断是否来得及
+    def on_time?(time)
+       # 返回 true 或者 false
+     end
+end
+
+class  UseBikeEvent
+     include Event
+    def create_vehicle
+        Bike.new
+     end
+end
+
+class UseCarEvent
+    include Event
+    def create_vehicle
+       Car.new
+     end
+end
+[/cc]
+MM类
+[cc lang="ruby"]
+class Mm
+    def use(name)
+       if name == &quot;giant&quot;
+          UseBikeEvent.new
+       elsif name == &quot;ferrari&quot;
+          UseCarEvent.new
+       end
+end
+
+def drive_me_to_work(event, miles)
+       event.go_to_work(miles)
+end
+end
+[/cc]
+测试就不写了，下面写个有趣的，如果MM这个类也扩展一下，如下
+[cc lang="ruby"]
+class Mm
+   include Event
+   def create_vehicle
+      Mm.new
+    end
+   # 也有go方法
+   def go;end
+   # 同理有count time
+   def count_time(miles);end
+
+# 陪我步行去上班
+    def walk_with_me_to_work(miles)
+       go_to_work(miles)
+     end
+end
+[/cc]
+可以看到ruby的mixi确实很灵活，而且没有类型检测，duck typing ，如果一个它可以开动(就是go方法)，可以计算时间，那么它就可以看成是交通工具(Vehicle)

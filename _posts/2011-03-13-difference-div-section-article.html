@@ -1,0 +1,89 @@
+--- 
+layout: post
+title: difference div section article
+tags: 
+- html5
+- HTML5&amp;CSS3
+status: publish
+type: post
+published: true
+meta: 
+  _edit_last: "1"
+  _edit_lock: "1300030670"
+  _wp_old_slug: ""
+  dsq_thread_id: "254436340"
+---
+<strong>1）div，section，article 是什么？</strong>
+
+div：块级元素，本身没有意义，如果加上class，或id，可以表示一段区域的含义，就是用来给文档划分区块，支持常见属性和事件。
+
+section：
+<blockquote>The section element represents a section of a document, typically with a title or heading.</blockquote>
+块级元素，有意义，表示文档的一段区域，也是用来给文档划分区块，支持常见属性和事件。
+
+article：
+<blockquote>The article element represents a section of content that forms an independent part of a document or site; for example, a magazine or newspaper article, or a blog entry.</blockquote>
+块级元素，有意义，表示文档内容的一段区域，用来给文档的内容划分区块，例如一篇博客或者一篇新闻，支持常见属性和事件。
+
+<strong>2） div，section，article 区别</strong>
+
+div：在写HTML的过程中，我们总是选择那些尽量贴切的标签来表示文档DOM，当实在没有合适的标签时，用无意义的div把内容划分组织起来。
+
+section：section和div很像，最大的区别显而易见，section是有意义的，它的作用是把文档中有关联的一组内容划分出来。
+section里面可以有的标签有，article，nav，aside，也可以是一段新的section（嵌套）。
+section可以做为设计整个页面框架的布局标签。
+
+article：和section一样，是有意义的标签，和section的主要区别是，每一个article都是独立存在的。可以试想这样一个情景，页面上有一个page group的"section"，里面的每一个page就可以作为一个"article"。
+
+<strong>3）div，section，article 各自使用的场景</strong>
+使用规则：
+
+a）当文档中的一段内容是完整并且独立的，例如有自己的标题，内容，页脚标注，就可以用article标签包裹起来。
+例如：
+[cc lang="html"]
+<article>
+  <header>
+    <h1>Title</h1>
+  </header>
+   <p>Content…</p>
+  <footer>
+    <p>.............</p>
+  </footer>
+</article>
+[/cc]
+
+b）当文档中的一段内容是彼此关联的，就可以用article标签包裹起来。
+例如：
+[cc lang="html"]
+// 一组article
+<section>
+  <article>.......</article>
+  <article>.......</article>
+  ....
+</section>
+[/cc]
+[cc]
+<article>
+	<h1>Title</h1>
+        // title和content是有关联的，所以可以为一个section
+        // 为什么不用article呢？
+        // 因为如果用article的话就是父容器的article的子元素
+        // 不符合article定义中独立的概念 
+	<section>
+		<h2>Section title</h2>
+		<p>Content</p>
+	</section>
+	<section>
+		<h2>Section title</h2>
+		<p>Content</p>
+	</section>
+	<section>
+		<h2>Section title</h2>
+		<p>Content</p>
+	</section>
+</article>
+[/cc]
+
+c）当文档中的一段内容找不到合适意义的标签，就用div，也就是说，当我们发现不适合用section或者article时，用div吧。
+
+<blockquote>参考链接 <a href="http://oli.jp/2009/html5-structure1/">html5-structure1</a></blockquote>

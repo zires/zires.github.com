@@ -1,0 +1,106 @@
+--- 
+layout: post
+title: ruby ugly number
+tags: 
+- Ruby&amp;Rails
+- "\xE9\x9D\xA2\xE8\xAF\x95\xE9\xA2\x98"
+status: publish
+type: post
+published: true
+meta: 
+  _wp_old_slug: ""
+  _syntaxhighlighter_encoded: "1"
+  _edit_lock: "1292778646"
+  _edit_last: "1"
+  dsq_thread_id: "279890117"
+---
+<blockquote>题目：我们把只包含因子2、3和5的数称作丑数（Ugly Number）。例如6、8都是丑数，但14不是，因为它包含因子7。习惯上我们把1当做是第一个丑数。 求按从小到大的顺序的第1500个丑数。</blockquote>
+想法：判断一个数是否是丑数，其实就是看它的所有质数因子是否只有2，3，5，也就转化为求一个数的质数因子（素数因子）。<span style="color: #ff0000;">后面会发现这个想法只是概念上的想法，实际上效率低的可怜</span>
+
+素数真是太有意思了，哥德巴赫猜想，<a href="http://baike.baidu.com/view/1767.htm">素数的百度百科</a>
+
+[cc lang="ruby"]
+# 判断是否为素数
+class Integer
+  def prime?
+      # 1 不是素数
+      return false if self == 1
+      2.upto(self - 1) { |i| return false if self%i == 0}
+      true
+  end
+end
+
+#测试
+73.prime? # => true
+[/cc]
+
+下面来求一个数所有的素因子
+
+[cc lang="ruby"]
+class Integer
+  def primes
+   (2..self).find_all { |i| self%i == 0 and i.prime?}
+  end
+end
+
+#测试
+100.primes # => [2,5]
+[/cc]
+
+判断是否为丑数
+
+[cc lang="ruby"]
+class Integer
+	def ugly?
+	  self.primes.uniq.delete_if {|x| [2,3,5].include?(x)}.empty?
+	end
+end
+
+#测试
+14.ugly？ # => false
+[/cc]
+
+下面来求
+
+[cc lang="ruby"]
+arr = [1]
+n = 2
+loop do
+	arr &lt;&lt; n if n.ugly?
+	n = n.next
+	break if arr.size == 99
+end
+
+p arr.last # => 1500
+[/cc]
+
+计算第99个已经用1s多了，第1500个不知道到什么时候呢，这样做只是用程序描诉了一遍概念，实际太耗时间了。
+
+<span style="color: red;">算法</span>
+<blockquote>可以看到丑数数组里面的每一个丑数是前面的丑数乘以2、3或者5得到的，由于顺序排列，必须将已知丑数组中最大数，假设是M，分别乘2，3，5，然后在得到的三个数中取出最小并且大于M的，这就是下一个丑数</blockquote>
+改进后的写法
+
+[cc lang="ruby"]
+def find_ugly_number(index)
+ # 初始队列
+ queue = [1]
+ # 临时队列
+ temp = []
+ # 初始值
+ m = 1
+ # 初始位置
+ position = 1
+ until (position == index)
+  [2,3,5].each do |i|
+    temp < < i * m
+  end 
+  m = temp.uniq.sort[position -1]
+  queue << m
+  position += 1
+  end
+  queue.last
+end
+
+#测试 大概用时1s
+p find_ugly_number(1500) #=> 859963392
+[/cc] 

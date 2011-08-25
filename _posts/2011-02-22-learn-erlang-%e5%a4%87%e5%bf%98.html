@@ -1,0 +1,175 @@
+--- 
+layout: post
+title: "learn erlang \xE5\xA4\x87\xE5\xBF\x98"
+tags: 
+- erlang
+- "\xE5\xA4\x87\xE5\xBF\x98"
+status: publish
+type: post
+published: true
+meta: 
+  _edit_lock: "1298883471"
+  _edit_last: "1"
+  dsq_thread_id: "246628067"
+---
+<blockquote><strong><p>基本语法和数据类型</p></strong></blockquote>
+1）使用`.`作为一段代码的结束，例如：
+[cc lang="erlang"]
+2+5.
+%>7
+[/cc]
+
+2）变量，以大写字母开头，并且只许"匹配"一次，例如：
+[cc lang="erlang"]
+Z = 1.
+%>1
+Z = 2.
+%>** exception error: no match of right hand side value 2
+[/cc]
+
+3）Atoms（原子），是Erlang中的一种数据类型，以小写字母开头，或者以大写字母开头，但有类似引号的闭合符号包裹着。Atoms就是个简单的名字，不能有值，例如：
+[cc lang="erlang"] 
+zires = 8.
+%> ** exception error: no match of right hand side value 8
+'ZIRES'
+%>'ZIRES'
+[/cc]
+
+4）fun（匿名函数），可以有可选条件when，例如：
+[cc lang="erlang"]
+f = fun (X) -> X+1 end.
+%#Fun<erl_eval .6.13229925>
+f(2).
+%>3
+
+Fun2 = fun (X) when X>=5 -> gt; (X) -> lt end.
+Fun2(7).
+%>gt
+
+[/cc]
+调用函数还有如下形式，
+[cc]
+fun Name/Arity
+fun Module:Name/Arity
+
+#其中Name是函数名，原子类型，Arity是整数类型，表示参数个数
+[/cc]
+例如，
+[cc lang="erlang"]
+fun lists:append/2([1,2], [3,4])
+%> [1,2,3,4]
+[/cc]
+
+5）Number，有integer和float两种数据类型。$char 返回char的ASCII值
+[cc]
+base#value
+Integer with the base base, which must be an integer in the range 2..36.
+In Erlang 5.2/OTP R9B and earlier versions, the allowed range is 2..16.
+
+#base#value表示比特位，二进制
+2#101. 就是2的平方*1+2的一次方*0+2的零次方*1
+[/cc]
+例子：
+[cc lang="erlang"]
+$A.
+%>65
+
+2#101.
+%>5
+
+2.3e-3.
+%>0.0023
+
+65.
+%>65
+[/cc]</erl_eval>
+
+6）复合数据类型Tuple，Tuple中每一个称为元素（element），官方的例子：
+[cc lang="erlang"]
+P = {adam,24,{july,29}}.
+%>{adam,24,{july,29}}
+
+element(1,P).
+%>adam
+
+element(3,P).
+%>{july,29}
+
+P2 = setelement(2,P,25).
+%>{adam,25,{july,29}}
+
+tuple_size(P).
+%>3
+
+tuple_size({}).
+%>0
+
+%反过来不行
+{a,b} = {X,b}.
+%>* 1: variable 'X' is unbound
+[/cc]
+
+7）复合数据类型List，List中每一个也称为元素（element），一个List[H|T]有Head（头）和Tail（尾），官方的例子：
+[cc lang="erlang"]
+L1 = [a,2,{c,4}].
+%>[a,2,{c,4}]
+
+[H|T] = L1.
+%>[a,2,{c,4}]
+
+H.
+%>a
+
+T.
+%>[2,{c,4}]
+
+L2 = [d|T].
+%>[d,2,{c,4}]
+
+length(L1).
+%>3
+length([]).
+%>0
+[/cc]
+
+7）严格上说，在erlang中并没有string类型，string其实是代表字符串的数字的数组，string只能由双引号包起来，例子：
+[cc lang="erlang"]
+[83,117,114,112,114,105,115,101].
+%>"Surprise"
+
+"erlang""good"
+%>"erlanggood"
+
+[/cc]
+<blockquote><strong><p>模式匹配</p></strong></blockquote>
+erlang中的等号不是赋值操作符，而是表示模式匹配，左边匹配右边，变量进行绑定，例子：
+[cc lang="erlang"]
+{X,abc} = {"lala",abc}.
+X.
+%>"lala"
+
+{X,Y} {333,ghi,"cat"}.
+%>匹配失败，身形不一样
+
+[H|T] = "cat".
+H.
+%>99
+T.
+%>"at"
+
+[/cc]
+<p>"_"可以在模式匹配中作为占位符使用</p>
+[cc lang="erlang"]
+
+{_,_,C} = {1,2,3}.
+C.
+%>3
+[/cc]
+
+<p>f()可以用来取消之前的绑定，重新给变量绑定新的值。</p>
+[cc lang="erlang"]
+X = 1.
+f().
+X = 2.
+%>2
+[/cc] 

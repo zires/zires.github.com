@@ -1,0 +1,308 @@
+--- 
+layout: post
+title: "Learn Ruby Metaprogramming \xE5\xA4\x87\xE5\xBF\x98"
+tags: 
+- Metaprogramming
+- Ruby&amp;Rails
+- "\xE5\xA4\x87\xE5\xBF\x98"
+status: publish
+type: post
+published: true
+meta: 
+  _edit_last: "1"
+  _edit_lock: "1300977098"
+  dsq_thread_id: "262038136"
+---
+又见元编程，元编程是拿语言本身当做操作的对象。
+元编程是Ruby的一种自省能力。
+
+<strong>1）继承族谱</strong>
+顶层的是BasicObject（ruby1.9新增）
+[cc lang="ruby"]
+ruby-1.9.2-rc2 > BasicObject.superclass
+ => nil 
+[/cc]
+Object继承自BasicObject
+[cc lang="ruby"]
+ruby-1.9.2-rc2 > Object.superclass
+ => BasicObject 
+[/cc]
+Module继承了Object
+[cc lang="ruby"]
+ruby-1.9.2-rc2 > Module.superclass
+ => Object
+[/cc]
+Class继承了Module
+[cc lang="ruby"]
+ruby-1.9.2-rc2 > Class.superclass
+ => Module 
+[/cc]
+
+注意观察：
+[cc lang="ruby"]
+Class.new.ancestors
+ => [#class:0x000000022ef638, Object, Kernel, BasicObject] 
+Class.ancestors
+ => [Class, Module, Object, Kernel, BasicObject]
+BasicObject.class
+ => Class 
+[/cc]
+
+<strong>2）main</strong>
+不管是java还是c，都有个main函数作为程序的入口，ruby的在哪呢？其实我们一直在用：
+[cc lang="ruby"]
+ruby-1.9.2-rc2 > self
+ => main 
+ruby-1.9.2-rc2 > self.class
+ => Object 
+[/cc]
+我们写的代码其实都是在这个top-level对象main中发生的，一切都是对象，看吧，一点也不奇怪。
+
+<strong>3）constants</strong>
+[cc]
+Module#const_get
+Module#const_set
+Module#remove_const
+[/cc]
+来看看ruby中的一般的常量（大写开头）：
+[cc lang="ruby"]
+irb(main):001:0> A = "1"
+=> "1"
+irb(main):002:0> self.class.const_get(:A)
+=> "1"
+[/cc]
+我们定义一个类的时候，其实也无形中给class这个类增加了一个常量，例如：
+[cc lang="ruby"]
+irb(main):004:0> class Zires;end
+=> nil
+irb(main):005:0> Class.constants.grep("Zires")
+=> ["Zires"]
+
+irb(main):008:0> Class.constants - Object.constants
+=> []
+[/cc]
+另外，constants在ruby中还扮演着类似文件路径的作用，例如：
+[cc lang="ruby"]
+module C
+  File = "in C"
+  class Doc
+    File = "in c/doc"
+    def root
+      p File
+      p ::C::File # 类似绝对路径，absolute path
+    end
+  end
+end
+
+irb(main):018:0> C::File
+=> "in C"
+irb(main):019:0> Doc::File
+NameError: uninitialized constant Doc
+	from (irb):19
+	from :0
+irb(main):020:0> C::Doc::File
+=> "in c/doc"
+irb(main):021:0> C::Doc.new.root
+"in c/doc"
+"in C"
+=> nil
+[/cc]
+
+<strong>4） dynamic define code</strong>
+[cc]
+Class#new
+Module#define_method
+Module#remove_method
+Module#method_defined?
+[/cc]
+看下面的例子：
+[cc lang="ruby"]
+oop = "Oops!"
+
+class Oops
+  def say
+    p "I say #{oop}"
+  end
+end
+
+Oops.new.say #=>undefined local variable or method `oop'
+
+oops = Class.new do
+
+  define_method :say do
+    p "I say #{oop}"	
+  end
+
+end
+
+oops.new.say # => "I say Oops!"
+[/cc]
+
+<strong>5） dynamic run code</strong>
+[cc]
+Object#send
+Object#instance_eval
+Module#module_eval
+Module#class_eval
+Kernel#eval
+
+block
+Proc
+proc
+lambda
+method
+[/cc]
+send：
+[cc lang="ruby"]
+ruby-1.9.2-p180 > 1.send(:+, 2)
+ => 3 
+[/cc]
+
+eval&binding：
+[cc lang="ruby"]
+ruby-1.9.2-p180 > eval("1+2")
+ => 3 
+
+ruby-1.9.2-p180 > x = 1
+ => 1 
+ruby-1.9.2-p180 > eval("x + 2")
+ => 3 
+
+def bind_x(x)
+  x = x
+  binding
+end
+
+ruby-1.9.2-p180 > eval("x + 2", bind_x(2))
+ => 4 
+[/cc]
+
+instance_eval：
+[cc lang="ruby"]
+ruby-1.9.2-p180 > 1.instance_eval { self + 2}
+ => 3 
+[/cc]
+
+class_eval：
+[cc lang="ruby"]
+1.class.class_eval do
+  def add_2
+    self + 2
+  end
+end
+
+ruby-1.9.2-p180 > 1.add_2
+ => 3 
+
+[/cc]
+
+ruby中有好几个'家伙'能响应call方法，与eval家族的区别是，他们具有延迟性：
+[cc lang="ruby"]
+#Proc Objects
+
+z = Proc.new { |x| p "#{x}"}
+z.call("a") # call的时候才执行
+ #=> "a" 
+
+l = lambda { |x| p "#{x}"}
+l.call("b")
+ #=> "b" 
+
+p = proc { |x| p "#{x}"}
+p.call("c")
+ #=> "c"
+
+def myself(x)
+  p "#{x}"
+end
+
+ m = method(:myself).class
+ #=> Method
+ m.call("d")
+# => "d" 
+[/cc]
+
+Proc vs proc vs lambda vs method 相同点：
+[cc lang="ruby"]
+#1）都响应call方法
+#2）method可以转化为proc，其余都是Proc的对象
+ruby-1.9.2-p180 > Proc.new{}.class
+ => Proc 
+ruby-1.9.2-p180 > lambda{}.class
+ => Proc 
+ruby-1.9.2-p180 > proc{}.class
+ => Proc
+
+ruby-1.9.2-p180 > method(:myself).to_proc.class
+#=> Proc
+[/cc]
+***block其实也是Proc***
+
+Proc vs proc vs lambda vs method 不同点：
+[cc lang="ruby"]
+#1）lambda 是Kernel方法，proc 也是Kernel方法，Proc是类，method是obj方法
+#2）关于return，看例子比较
+def check(callable)
+  callable.call
+  return "I AM Here!"
+end
+
+check lambda { return 10 }
+# => "I AM Here!"
+
+check Proc.new { return 10 }
+# => LocalJumpError: unexpected return
+
+check proc { return 10
+# ruby1.8可能输出"I AM Here!"，ruby1.9把proc和Proc统一了
+# proc其实就是Proc.new 
+# => LocalJumpError: unexpected return
+
+def myself ; return 10 ; end
+check method(:myself)
+# => "I AM Here!"
+
+#3）关于参数
+l = lambda { |x| p "#{x}"}
+p = Proc.new { |x| p "#{x}"}
+ruby-1.9.2-p180 > p.arity
+# => 1 
+ruby-1.9.2-p180 > l.arity
+# => 1
+ 
+ruby-1.9.2-p180 > p.call
+# => ""
+
+ruby-1.9.2-p180 > l.call
+# => ArgumentError: wrong number of arguments (0 for 1)
+
+#4）lambda? 方法
+
+ruby-1.9.2-p180 > lambda {}.lambda?
+ => true 
+ruby-1.9.2-p180 > proc{}.lambda?
+ => false 
+
+#5）简便写法
+# lamda1.9新增
+ruby-1.9.2-p180 > ->(x){ p "#{x}"}.class
+# => Proc
+
+#6）method可以 unbind
+#  看 UnboundMethod
+
+[/cc]
+
+<strong>6） callbacks </strong>
+[cc]
+method_missing
+const_missing
+
+included and extended
+method_added and singleton_method_added
+method_removed and method_undefined
+singleton_method_removed and singleton_method_undefined
+inherited
+ 
+# 这些方法看文档吧，比较全
+[/cc] 

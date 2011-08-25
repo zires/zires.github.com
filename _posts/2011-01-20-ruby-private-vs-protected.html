@@ -1,0 +1,65 @@
+--- 
+layout: post
+title: ruby private vs protected
+tags: 
+- private
+- protected
+- ruby
+- Ruby&amp;Rails
+status: publish
+type: post
+published: true
+meta: 
+  _edit_lock: "1296113206"
+  _edit_last: "1"
+  _wp_old_slug: ""
+  dsq_thread_id: "250579446"
+---
+ruby中控制访问属性的关键字有三个，<strong>public</strong>，<strong>protected</strong>，和<strong>private</strong>。
+<p>public不多说了。来看看protected和private。</p>
+<p>我们知道，访问权限关心的一般只有两方面，一个是实例，另一个是继承。</p>
+<p style="color:#ff0000;">先抛出结论：在ruby中，protected和private都只在类的定义内访问有效，并且可以被继承，但是实例和继承访问都会抛出NoMethodError，另外，两者区别是，protected可以有明确的方法接收者，而private不可以。</p>
+<p>注意比较区别，例子如下：</p>
+[cc lang="ruby"]
+class Foo
+  def a
+    b
+  end
+    
+  def aa
+    c
+  end
+
+  def f
+     self.b
+  end
+
+  def ff
+     self.c
+  end	
+protected
+	def	b
+		p  "protected method from Foo"
+	end
+private
+	def	c
+		p  "private method form Foo"
+	end
+end
+
+class Bar < Foo
+end
+
+Foo.new.b #=> NoMethodError
+Foo.new.c #=> NoMethodError
+Bar.new.b #=> NoMethodError
+Bar.new.c #=> NoMethodError
+
+#======
+Foo.new.a    #=> "protected method from Foo"
+Foo.new.aa  #=> "private method form Foo"
+
+#======
+Foo.new.f #=>  "protected method from Foo"
+Foo.new.ff  #=> NoMethodError
+[/cc]

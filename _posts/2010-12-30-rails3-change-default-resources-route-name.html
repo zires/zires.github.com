@@ -1,0 +1,32 @@
+--- 
+layout: post
+title: rails3 change default resources route name
+tags: 
+- rails3
+- routes
+- Ruby&amp;Rails
+status: publish
+type: post
+published: true
+meta: 
+  _edit_last: "1"
+  _edit_lock: "1293671929"
+  dsq_thread_id: "273219515"
+---
+rails3的路由足够强大，可以基本上配出你想要的任意url。
+现在有这样一个需求：
+将[cci lang="ruby"]resources :posts[/cci] 改为 [cci lang="ruby"]resources :pages[/cci]（controller 还是走posts）。
+如何实现？
+非常简单
+[cc lang="ruby"]
+resources :page, :controller => :posts
+# 看看生成的路由
+page_index GET    /page(.:format)      {:controller=>"posts", :action=>"index"}
+page_index POST   /page(.:format)     {:controller=>"posts", :action=>"create"}
+new_page GET    /page/new(.:format)  {:controller=>"posts", :action=>"new"}
+edit_page GET    /page/:id/edit(.:format) {:controller=>"posts", :action=>"edit"}
+page GET    /page/:id(.:format)   {:controller=>"posts", :action=>"show"}
+page PUT    /page/:id(.:format)   {:controller=>"posts", :action=>"update"}
+page DELETE /page/:id(.:format) {:controller=>"posts", :action=>"destroy"}
+[/cc]
+OK!

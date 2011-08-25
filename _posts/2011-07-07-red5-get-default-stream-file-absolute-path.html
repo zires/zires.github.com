@@ -1,0 +1,37 @@
+--- 
+layout: post
+title: red5 get default stream file absolute path
+tags: 
+- Red5
+- red5
+status: publish
+type: post
+published: true
+meta: 
+  _edit_lock: "1310021505"
+  _edit_last: "1"
+---
+These days i has been fell into <a href="http://www.red5.org/" target="_blank">Red5 </a> program. The Red5 Application will save live stream in the default path - /webapps/yourAppName/streams. Of couse, we can change the default path to custom directories. Check here <a href="http://www.red5tutorials.net/index.php/Tutorials%3aStreaming_from_custom_directories">Streaming from custom directories</a> for more details.
+
+I am a lazy boy, moreover, the default path works fine. But i need to do some transcoding between flv and mp3. So i must get the saved file absolute path. Below is my code for getting the path.
+
+Email me or leave a message when you find a better way!!
+
+这些天一直在做Red5服务器端的开发，Red5应用默认会把实时的音频或者视频流放在/webapps下的streams文件夹下。当然，我们可以自定义文件的存放路径，详细的见<a href="http://www.red5tutorials.net/index.php/Tutorials%3aStreaming_from_custom_directories">这篇文章</a>。
+
+我懒的改默认的存放位置，但是由于要做.flv和.mp3的转码，想知道文件的绝对位置，网上搜资料和看API都没有发现返回默认文件路径的方法，查源码写了个，可以拿来参考，代码如下：
+[cc lang="java"]
+import ...;
+
+public class Application extends MultiThreadedApplicationAdapter{
+  public String getDefaultStreamPath(IScope scope, String name) throws IOException{
+		IStreamFilenameGenerator generator = (IStreamFilenameGenerator) ScopeUtils.getScopeService(scope, IStreamFilenameGenerator.class, DefaultStreamFilenameGenerator.class);
+		String recordingFilename = generator.generateFilename(scope, name, ".flv", GenerationType.RECORD);
+		File file = scope.getContext().getResource(recordingFilename).getFile();
+		return file.getAbsolutePath().replace("\\", "\\\\");  // Windows path 
+	}
+}
+[/cc]
+
+如果谁知道有更好的方法，可以给我留言或者发邮件。
+

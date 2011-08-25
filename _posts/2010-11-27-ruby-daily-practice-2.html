@@ -1,0 +1,44 @@
+--- 
+layout: post
+title: ruby daily practice 2
+tags: 
+- Ruby&amp;Rails
+- "\xE9\x9D\xA2\xE8\xAF\x95\xE9\xA2\x98"
+status: publish
+type: post
+published: true
+meta: 
+  _edit_last: "1"
+  _edit_lock: "1292778086"
+  _syntaxhighlighter_encoded: "1"
+  _wp_old_slug: ""
+  dsq_thread_id: "331378077"
+---
+<blockquote>给定字符串，删除开始和结尾处的空格，并将中间的多个连续的空格合并成一个。
+比如 “  I like     http://www.zires.info  ” 会变成 "I like http://www.zires.info"。</blockquote>
+<p>分析：分为两部分，先去除头尾的空格，再将中间的空格合并。</p>
+（一）ruby的string自带了N多方法，足够操作字符串了。
+[cc lang="ruby"]
+example = " i like      http://www.zires.info   ";
+# 使用strip 去头尾空格
+example.strip # = "i like       http://www.zires.info";
+# 使用squeeze 去除中间空格
+# squeeze 会根据传进去的str 把符合条件的str连续相同的合并
+# 所以这里我们传进去一个空格
+example.squeeze(" ") # ="i like http://www/zires.info";
+
+#合起来写
+example.strip.squeeze(" ")
+完成
+[/cc]
+（二）没有比正则表达式更适合操作字符串了
+[cc lang="ruby"]
+example = " i like      http://www.zires.info   ";
+# 同样先使用strip
+# 接着使用gsub，匹配一个或多个空格，用""替代
+
+# 完整写
+example.strip.gsub(/\s/,"")
+# ="i like http://www.zires.info";
+[/cc]
+大功告成

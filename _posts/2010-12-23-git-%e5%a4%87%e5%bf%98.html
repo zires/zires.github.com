@@ -1,0 +1,63 @@
+--- 
+layout: post
+title: "git \xE5\xA4\x87\xE5\xBF\x98"
+tags: 
+- git
+- "\xE5\xA4\x87\xE5\xBF\x98"
+status: publish
+type: post
+published: true
+meta: 
+  _edit_lock: "1297817223"
+  _edit_last: "1"
+  _wp_old_slug: ""
+  dsq_thread_id: "325559461"
+---
+1）如何取消上一次的提交
+[cc lang="ruby"]
+git reset --soft HEAD^
+git commit -a -c ORIG_HEAD #ORIG_HEAD 是reset时对HEAD的拷贝
+[/cc]
+2）如何取消全部的本地修改
+[cc lang="ruby"]
+# 如果你没有提交
+git checkout .
+# 如果你提交了先
+git reset
+# 然后
+git checkout .
+[/cc]
+3）如果我想切另外一个分支，但是当前分支有了修改，当前分支修改还没有完成，所以又不想提交，怎么办？
+[cc lang="ruby"]
+# 临时保存当前分支的修改
+git stash
+# 更复杂点
+git stash save [--keep-index] [<message>]
+# 列出所有的stash
+git stash list
+# 恢复
+git stash apply
+# or
+git stash pop
+[/cc]</message>
+<strong style="color:#ff0000;">注意：这个命令不会保存当前分支中Untracked的文件，所以记得在切到其他分支的时候，谨慎使用git clean</strong>
+
+4）设定user name 和 email
+[cc lang="ruby"]
+# 全局设定
+git config --global user.name "zires"
+git config --global user.email "xxx@xx.com"
+
+# 或者切到一个单独的repos中单独设置
+git config user.name "zires"
+git config user.email "xxx@xx.com"
+[/cc]
+5）打补丁
+[cc lang="ruby"]
+# git format-patch -n {commit_id}
+git format-patch -1 {commit_id}
+# 会生成一个0001-{commit message}.patch的文件
+
+git am 0001-{commit message}.patch.patch # 或者
+git apply 0001-{commit message}.patch.patch
+[/cc] 

@@ -1,0 +1,91 @@
+--- 
+layout: post
+title: "erlang operator \xE5\xA4\x87\xE5\xBF\x98"
+tags: 
+- erlang
+- "\xE5\xA4\x87\xE5\xBF\x98"
+status: publish
+type: post
+published: true
+meta: 
+  _edit_lock: "1298866322"
+  _edit_last: "1"
+  _wp_old_slug: ""
+  dsq_thread_id: "245792556"
+---
+erlang中的运算符
+<strong>1）算术运算符</strong>
+[caption id="attachment_491" align="alignnone" width="150" caption="Arithmetic Operators"]<a href="http://zires.info/wp-content/uploads/2011/02/Arithmetic-Operators.png"><img src="http://zires.info/wp-content/uploads/2011/02/Arithmetic-Operators-150x150.png" alt="Arithmetic Operators" title="Arithmetic Operators" width="150" height="150" class="size-thumbnail wp-image-491" /></a>[/caption]
+[cc lang="erlang"]
+1> +1.
+1
+2> -1.
+-1
+3> 1+1.
+2
+4> 2/2.
+1.0
+5> 5 div 3.
+1
+6> 5 rem 3.
+2
+[/cc]
+<p>band是按位与运算，bor是按位或运算，bxor是按位异或，bsl按位左移，bsr按位右移，注意最后的结果都是二进制。</p>
+[cc lang="erlang"]
+1> 2#10 band 2#110.
+2
+2> 3#10 bor 2#100.
+7 %这里3#10先换算成了2#11
+3> 2#10 bxor 2#11.
+1
+4> 2#10 bsl 2.
+8
+5> 2#10 bsr 2.
+0
+[/cc]
+
+<strong>2）比较运算符</strong>
+[caption id="attachment_498" align="alignnone" width="150" caption="Comparison Operators"]<a href="http://zires.info/wp-content/uploads/2011/02/ecr02-05.png"><img src="http://zires.info/wp-content/uploads/2011/02/ecr02-05-150x150.png" alt="Comparison Operators" title="Comparison Operators" width="150" height="150" class="size-thumbnail wp-image-498" /></a>[/caption]
+<p>data type的大小排序：</p>
+[cc]
+number < atom < reference < fun < port < pid < tuple < list < bit string
+[/cc]
+=:=和==，/=和=/=的区别：
+[cc lang="erlang"]
+1> 1 == 1.0.
+true
+2> 1=:=1.0.
+false
+3> 1 /= 1.0.
+false
+4> 1 =/= 1.0.
+true
+[/cc]
+
+<strong>3）逻辑运算符</strong>
+四个，not，and，or，xor
+[cc lang="erlang"]
+1> not true.
+false
+2> true and false.
+false
+3> true xor false.
+true
+4> true or garbage.
+** exception error: bad argument
+[/cc]
+
+<strong>4）数组运算</strong>
+最后还有个数组运算，++或者--，很简单
+[cc lang="erlang"]
+1> [1,2] ++ [3,4].
+[1,2,3,4]
+2> [1,2] -- [3,4].
+[1,2]
+3> [1,2] -- [1,4].
+[2]
+4> [1,2] ++ [1,4].
+[1,2,1,4]
+5> [1,2] -- [1,2].
+[]
+[/cc] 
