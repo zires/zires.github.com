@@ -80,6 +80,10 @@ a:hover { color: #036; }
  *
  * Author: zires 
  */
+body{
+  font: 13px/1.231 'Trebuchet MS', 'PT Sans', Helvetica, sans-serif;
+}
+
 #container{ 
   background: url('/images/bg.jpg') repeat scroll 0 0 transparent;
   width:100%;
@@ -156,10 +160,11 @@ a:hover { color: #036; }
   width:738px;
   padding-top:10px;
   font-size:14px;
+  font-weight: bold;
 }
 
 #aboutMe .avatar{
-  width:200px;
+  width:180px;
 }
 
 #container footer{
