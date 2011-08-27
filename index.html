@@ -23,20 +23,34 @@
       <h1>Zires<span>web developer & rubyist</span></h1>
     </div>
     <nav>
-    <a href="/blog.html">{BLOG}</a>
-    <a href="javascript:;" id="aboutMe">{ABOUT}</a>
+    <a href="javascript:;">{BLOG}</a>
+    <a href="javascript:;" id="linkaboutMe">{ABOUT}</a>
     </nav>
     <div class="clearfix"></div>
     </header>
     <div id="main" role="main">
-
+      <div id="aboutMe" class="hidden">
+        <img src="/images/avatar.jpg" class="avatar"/>
+        <div class="profile">
+          I am zires, ruby&rails coder, live in ShangHai. I like open source projects, and also enjoy c, android development. Ubuntu is my favorite OS. Btw, i love arsenal football team. 
+        </div>
+      </div>
     </div>
     <footer>
-
+      <div id="connection">
+          <a href="http://plus.google.com/zshuaibin"><img src="/images/google.png" /></a>
+          <a href="https://github.com/zires"><img src="/images/github.png" /></a>
+          <a href="http://twitter.com/t_zires"><img src="/images/twitter.png" /></a>
+          <a href="http://weibo.com/zires"><img src="/images/sina.png" /></a>
+          <a href="http://renren.com/zshuaibin"><img src="/images/renren.png" /></a>
+      </div>
+      <div id="server">
+        &copy; 2011 · Power by zires · All Rights Reserved
+      </div>
     </footer>
   </div> <!-- eo #container -->
 
-  <script>window.jQuery || document.write("<script src='js/libs/jquery-1.5.1.min.js'>\x3C/script>")</script>
+  <script>window.jQuery || document.write("<script src='js/libs/jquery-1.6.2.min.js'>\x3C/script>")</script>
 
   <!-- scripts concatenated and minified via ant build script-->
   <script src="js/plugins.js"></script>

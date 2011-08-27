@@ -127,9 +127,63 @@ a:hover { color: #036; }
   padding:30px 0;
 }
 
+#main{
+  margin:40px auto;
+  width:960px;
+  min-height:150px;
+  height: auto !important;
+	height: 150px;
+	overflow: visible;
+}
+
+#main img{
+  border: 1px solid #000000;
+  border-radius: 4px 4px 4px 4px;
+  moz-border-radius: 4px 4px 4px 4px;
+  webkit-border-radius: 4px 4px 4px 4px;
+  box-shadow: 0 0 7px #000000;
+  moz-box-shadow: 0 0 7px #000000;
+  webkit-box-shadow: 0 0 7px #000000;
+}
+
+#main #aboutMe{
+  color:#ffffff;
+  text-shadow: 1px 1px 1px #000000;
+}
+
+#aboutMe .profile{
+  float:right;
+  width:738px;
+  padding-top:10px;
+  font-size:14px;
+}
+
+#aboutMe .avatar{
+  width:200px;
+}
+
+#container footer{
+  width:960px;
+  margin:0 auto;
+  padding-top: 20px;
+}
+
+#server{
+  color:#fff;
+  text-align:center;
+}
+
+#connection{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+#connection a {
+  margin-right:10px;
+}
 
 .ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
-.hidden { display: none; visibility: hidden; }
+.hidden { display: none;}
 .visuallyhidden { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
 .visuallyhidden.focusable:active,
 .visuallyhidden.focusable:focus { clip: auto; height: auto; margin: 0; overflow: visible; position: static; width: auto; }
