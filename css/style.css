@@ -82,10 +82,10 @@ a:hover { color: #036; }
  */
 body{
   font: 13px/1.231 'Trebuchet MS', 'PT Sans', Helvetica, sans-serif;
+  background: url("/images/bg.jpg") repeat scroll 0 0 transparent;
 }
 
 #container{ 
-  background: url('/images/bg.jpg') repeat scroll 0 0 transparent;
   width:100%;
   height:600px;
 }
@@ -185,6 +185,10 @@ body{
 
 #connection a {
   margin-right:10px;
+}
+
+.menu .current{
+  border-top:2px solid #FFAA01;
 }
 
 .ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
