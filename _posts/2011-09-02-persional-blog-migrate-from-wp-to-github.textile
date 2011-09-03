@@ -1,0 +1,13 @@
+---
+layout: post
+category: daily_live
+title: my blog migrate form wordpress to github
+lang: chinese
+---
+h1. 博客搬家了
+
+p. 很不幸，之前的博客由于没有备案，被zf给关禁闭了，我很无语，这样一个小小的技术博客也要和谐，实在不想去弄那繁琐的备案，所以正好也借此机会，将原先的wordpress博客迁移到了github上。
+
+p. 迁移过来才发现，github + jekyll的方案也很好用，学习成本也不大，但是从wordpress导出的文章会出现乱码，估计之前的文章还要做一番修改，毕竟代码高亮都不好使了，得重新修一下，以后有时间再搞吧。
+
+p. 自己简单设计了下样式，以后就用这个写了:)

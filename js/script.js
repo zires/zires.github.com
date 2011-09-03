@@ -1,28 +1,10 @@
 /* Author: zires
 */
-$("#linkaboutMe").click(function(){
-  $('#aboutMe').show('slow');
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+$("#blog ul li a").hover(
+    function(){
+      $(this).parent().css({"color": "#FFAA01"});
+    },
+    function(){
+      $(this).parent().css({"color": "#fff"});
+    }
+);

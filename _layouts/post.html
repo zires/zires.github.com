@@ -7,48 +7,52 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <title>zires | rubyist</title>
-  <meta name="description" content="zires personal blog">
+  <meta name="description" content="{{ page.title }}">
   <meta name="author" content="zires">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="/favicon.ico">
-  <link rel="stylesheet" href="css/style.css">
-  <script src="js/libs/modernizr-1.7.min.js"></script>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/libs/modernizr-1.7.min.js"></script>
 </head>
 
 <body>
-
   <div id="container">
     <header>
-    <div id="logo">
-      <h1><a href="/">Zires<span>web developer & rubyist</span></a></h1>
-    </div>
-    <div class="clearfix"></div>
+      <div id="logo">
+        <h1><a href="/">Zires<span>web developer & rubyist</span></a></h1>
+      </div>
+      <div class="clearfix"></div>
     </header>
     <div id="main" role="main">
-      <div id="blog">
-        <div class="article">
-          <div class="head">Ruby&Rails</div>
-          <div class="body">
-            <ul>
-              <li><a href="javascript:;" class="chinese">2011-09-03 Rails3.1 更新说明</a></li>
-            </ul>
-          </div>
+      <div id="content">
+        <div class="returnBack">
+          <a href="/" title="back 返回"><img src="/images/return.png"/></a>
         </div>
-        <div class="article last">
-          <div class="head">Daily Live</div>
-          <div class="body">
-            <ul>
-              <li><a href="/daily_live/2011/09/02/persional-blog-migrate-from-wp-to-github.html" class="chinese">2011-09-02 博客搬家了</a></li>
-            </ul>
-          </div>
+				<div class="result {{ page.lang }}">
+					{{ content }}
+				</div>
+				<div class="slide">
+					<div class="date">
+						<strong class="day">{{ page.date | date: '%d' }}</strong>
+						<div class="holder">
+							<span class="month">{{ page.date | date: '%m' }}</span>
+              <span class="year">{{ page.date | date: '%Y' }}</span>						
+						</div>
+					</div>
+					<div class="categories">
+						<strong class="title">categories</strong>
+            <p class="pp">{{ page.category }}</p>					
+					</div>
+					<div class="tags">
+						<strong class="title">categories</strong>
+						<p class="pp">{{ page.category }}</p>	
+					</div>
+				</div>
+				<div class="clearfix"></div>			
+        <div class="returnBack">
+          <a href="/" title="back 返回"><img src="/images/return.png"/></a>
         </div>
-      </div>
-      <div id="aboutMe">
-        <img src="/images/avatar.png" class="avatar effect"/>
-        <div class="profile">
-          I am zires, ruby&rails coder, live in ShangHai. I like open source projects, and also enjoy c, android development. Ubuntu is my favorite OS. Btw, i love arsenal football team. 
-        </div>
-      </div>
+			</div>
     </div>
     <footer>
       <div id="connection">
@@ -67,11 +71,11 @@
     </footer>
   </div> <!-- eo #container -->
 
-  <script>window.jQuery || document.write("<script src='js/libs/jquery-1.6.2.min.js'>\x3C/script>")</script>
+  <script>window.jQuery || document.write("<script src='/js/libs/jquery-1.6.2.min.js'>\x3C/script>")</script>
 
   <!-- scripts concatenated and minified via ant build script-->
-  <script src="js/plugins.js"></script>
-  <script src="js/script.js"></script>
+  <script src="/js/plugins.js"></script>
+  <script src="/js/script.js"></script>
   <!-- end scripts-->
 
   <!--[if lt IE 7 ]>
@@ -81,3 +85,4 @@
 
 </body>
 </html>
+

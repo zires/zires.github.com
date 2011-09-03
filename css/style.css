@@ -71,8 +71,8 @@ button {  width: auto; overflow: visible; }
 
 body, select, input, textarea { color: #444; }
 h1, h2, h3, h4, h5, h6 { font-weight: bold; }
-a, a:active, a:visited { color: #607890; }
-a:hover { color: #036; }
+a, a:active, a:visited { color: #fff; }
+a:hover { color: #fff; }
 
 
 /**
@@ -140,16 +140,6 @@ body{
 	overflow: visible;
 }
 
-#main img{
-  border: 1px solid #000000;
-  border-radius: 4px 4px 4px 4px;
-  moz-border-radius: 4px 4px 4px 4px;
-  webkit-border-radius: 4px 4px 4px 4px;
-  box-shadow: 0 0 7px #000000;
-  moz-box-shadow: 0 0 7px #000000;
-  webkit-box-shadow: 0 0 7px #000000;
-}
-
 #main #aboutMe{
   color:#ffffff;
   text-shadow: 1px 1px 1px #000000;
@@ -169,8 +159,8 @@ body{
 
 #container footer{
   width:960px;
-  margin:0 auto;
   padding-top: 20px;
+  margin: 0 auto 40px;
 }
 
 #server{
@@ -189,6 +179,167 @@ body{
 
 .menu .current{
   border-top:2px solid #FFAA01;
+}
+
+#main #blog{
+  color: #FFFFFF;
+  margin-bottom:20px;
+  text-shadow: 1px 1px 1px #000000;
+  min-height:165px;
+  height: auto !important;
+	height: 165px;
+	overflow: visible;
+}
+
+#blog div.article{
+  float:left;
+  width:470px;
+  margin-right:20px;
+}
+
+#blog .last{
+  margin-right:0px !important;
+}
+
+#blog div.article .head{
+  color:#BF9CBD;
+  font-size:16px;
+  margin-bottom:10px;
+}
+
+#blog div.article .body ul li{
+  margin-bottom:10px;
+}
+
+#blog div.article .body ul li a{
+  font-size:14px;
+  color:#fff;
+  text-decoration: none;
+}
+
+#blog div.article .body ul li span{
+  margin-right:5px;
+  color:#fff;
+}
+
+#email{
+  text-align: center;
+  margin-top:20px;
+}
+
+#email img{
+  border:0 none;
+  box-shadow:none;
+}
+
+img.effect{
+  border: 1px solid #000000;
+  border-radius: 4px 4px 4px 4px;
+  moz-border-radius: 4px 4px 4px 4px;
+  webkit-border-radius: 4px 4px 4px 4px;
+  box-shadow: 0 0 7px #000000;
+  moz-box-shadow: 0 0 7px #000000;
+  webkit-box-shadow: 0 0 7px #000000;
+}
+
+#main #content .result{
+  float:left;
+  width:738px;
+  background-color:#fff;
+  padding: 30px 30px 15px 30px;
+  border: solid 1px #E7E7E7;
+  color:#292929;
+  min-height:152px;
+  height: auto !important;
+	height: 152px;
+	overflow: visible;
+}
+
+.result p{
+  font-size:14px;
+  margin-top:10px;
+}
+
+.result h1{
+  font-size:20px;
+  margin: 0 0 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px dotted #DDDDDD;
+}
+
+#main #content .slide{
+  float:left;
+  width:129px;
+  background: url("/images/slidebg.jpg") repeat scroll 0 0 transparent;
+  border-bottom: 1px solid #E7E7E7;
+  border-right: 1px solid #E7E7E7;
+  border-top: 1px solid #E7E7E7;
+  padding: 22px 15px 25px;
+  min-height:150px;
+  height: auto !important;
+	height: 150px;
+	overflow: visible;
+}
+
+.slide .date{
+   border-bottom: 1px dotted #CCCCCC;
+   color: #A4A4A4;
+   float: left;
+   font-family: 'Play',Helvetica;
+   font-size: 14px;
+   font-weight: bold;
+   line-height: 18px;
+   width: 90px;
+}
+
+.date .day{
+  color: #2E2E2E;
+  float: left;
+  font-size: 34px;
+  letter-spacing: -3px;
+  line-height: 48px;
+}
+
+.date .holder{
+  float: right;
+  padding: 10px 0 0;
+  width: 49px;
+}
+
+.holder .month{
+  color: #797979;
+  display: block;
+  margin: 0 0 -6px;
+  text-transform: uppercase;
+}
+
+.slide .categories{
+  float: left;
+  padding: 15px 11px 0 0;
+  width: 100%;
+}
+
+.slide .tags{
+   float: left;
+   padding: 15px 0 0;
+   width: 100%;
+}
+
+strong.title{
+  color: #494949;
+  display: block;
+  font-weight: bold;
+  line-height: 12px;
+}
+
+p.pp{
+  font-size:12px;
+  margin-top:5px;
+  color: #BF9CBD;
+}
+
+.chinese{
+  font: 13px/1.231 "Microsoft Yahei", "微软雅黑", Arial, Helvetica, sans-serif !important;
 }
 
 .ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
