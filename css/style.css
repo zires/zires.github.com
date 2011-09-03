@@ -342,6 +342,10 @@ p.pp{
   font: 13px/1.231 "Microsoft Yahei", "微软雅黑", Arial, Helvetica, sans-serif !important;
 }
 
+#logo a{
+  text-decoration: none;
+}
+
 .ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
 .hidden { display: none;}
 .visuallyhidden { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
