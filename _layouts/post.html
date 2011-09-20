@@ -12,9 +12,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/js/libs/styles/ir_black.css">
   <script src="/js/libs/modernizr-1.7.min.js"></script>
+  <script>window.jQuery || document.write("<script src='/js/libs/jquery-1.6.2.min.js'>\x3C/script>")</script>
+  <script src="/js/libs/highlight.pack.js"></script>
+  <script>
+    hljs.tabReplace = ' ';
+    hljs.initHighlightingOnLoad();
+  </script>
 </head>
-
 <body>
   <div id="container">
     <header>
@@ -70,8 +76,6 @@
       </div>
     </footer>
   </div> <!-- eo #container -->
-
-  <script>window.jQuery || document.write("<script src='/js/libs/jquery-1.6.2.min.js'>\x3C/script>")</script>
 
   <!-- scripts concatenated and minified via ant build script-->
   <script src="/js/plugins.js"></script>

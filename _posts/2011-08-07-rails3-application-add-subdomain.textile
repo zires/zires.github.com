@@ -8,12 +8,6 @@ tags:
 status: publish
 type: post
 published: true
-meta: 
-  _edit_lock: "1312696243"
-  _edit_last: "1"
-  _syntaxhighlighter_encoded: "1"
-  _wp_old_slug: ""
-  _oembed_265428cfe2da3af92ee179e265edb989: "{{unknown}}"
 ---
 在rails3项目中配置subdomain。假设我们有个网站www.zires.info。我想把www.zires.info/photos变成子域名的形式www.photos.zires.info。
 
