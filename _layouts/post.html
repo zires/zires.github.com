@@ -29,32 +29,14 @@
       </div>
       <div class="clearfix"></div>
     </header>
-    <div id="main" role="main">
+    <div id="main" role="main" class="post_main">
       <div id="content">
-        <div class="returnBack">
-          <a href="/" title="back 返回"><img src="/images/return.png"/></a>
+        <div class="post_title {{ page.lang }}">
+          {{ page.title }}<span>{{ page.date | date: '%Y-%m-%d'}}</span>
         </div>
-				<div class="result {{ page.lang }}">
+        <div class="result {{ page.lang }}">
 					{{ content }}
 				</div>
-				<div class="slide">
-					<div class="date">
-						<strong class="day">{{ page.date | date: '%d' }}</strong>
-						<div class="holder">
-							<span class="month">{{ page.date | date: '%m' }}</span>
-              <span class="year">{{ page.date | date: '%Y' }}</span>						
-						</div>
-					</div>
-					<div class="categories">
-						<strong class="title">categories</strong>
-            <p class="pp">{{ page.category }}</p>					
-					</div>
-					<div class="tags">
-						<strong class="title">Tags</strong>
-						<p class="pp">{{ page.tag }}</p>	
-					</div>
-				</div>
-				<div class="clearfix"></div>			
         <div class="returnBack">
           <a href="/" title="back 返回"><img src="/images/return.png"/></a>
         </div>

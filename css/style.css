@@ -243,8 +243,7 @@ img.effect{
 }
 
 #main #content .result{
-  float:left;
-  width:738px;
+  width:100%;
   background-color:#fff;
   padding: 30px 30px 15px 30px;
   border: solid 1px #E7E7E7;
@@ -262,8 +261,7 @@ img.effect{
 
 .result h1{
   font-size:20px;
-  margin: 0 0 15px;
-  padding-bottom: 15px;
+  padding-bottom: 10px;
   border-bottom: 1px dotted #DDDDDD;
 }
 
@@ -344,6 +342,30 @@ p.pp{
 
 #logo a{
   text-decoration: none;
+}
+
+.post_main{
+  margin-top:0px !important;
+}
+
+#content .post_title{
+  color: #FFFFFF;
+  text-shadow: 1px 1px 1px #000000;
+  font-size:20px !important;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.post_title span{
+  font-size:10px;
+  margin-left:10px;
+  color:#ddd;
+}
+
+.returnBack{
+  position:fixed;
+  left:0px;
+  top:150px;
 }
 
 .ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
