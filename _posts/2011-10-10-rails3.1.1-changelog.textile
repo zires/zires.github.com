@@ -1,0 +1,44 @@
+---
+layout: post
+title: rails3.1.0更新说明
+lang: chinese
+---
+p. lastest version - rails3.1.0.rc8
+
+*railties*
+
+* 默认的数据库schema文件改为UTF-8编码
+* 新建项目时--dev和--edge参数取决于sass-rails和coffee-rails的git版本
+* +Rack::Sendfile中间件只在x_sendfile_header设置的时候启用+
+* Add JavaScript Runtime name to the Rails Info properties
+* rails控制台默认使用pp输出
+* rails runner可以使用别名rails r
+* 生成项目的时候可以使用--skip-sprockets参数拒绝生成sprockets
+* Rails.groups handles Rails.env and ENV["RAILS_GROUPS"]
+
+bc(ruby).. Rails.groups
+# => [:default, "development"]
+Rails.env
+#=> "development"
+
+p. 
+* 增加新的rake命令rake task assets:clean用来移除没有编译的assets
+* 生成项目时如果没有加--skip-gemfile或者--skip-bundle，将自动运行bundle install
+* Fixed database tasks for jdbc* adapters #jruby
+* Template generation for jdbcpostgresql  #jruby
+* Template generation for jdbcmysql and jdbcsqlite3 #jruby
+* rails new 新项目时，-j 选项后面可以加一个值，-j 'foo'将会在Gemfile加上gem "foo-rails"，默认值是'jquery'
+* jQuery不再绑定, 使用jquery-rails gem
+* Prototype和Scriptaculous不再绑定，使用prototype-rails gem
+* 使用脚手架(scaffold)生成controller的时候，如果Sass可用，将会生成Scss文件
+* 同样会优先生成Coffeejs或者Sass
+* +jQuery变成默认的js库+
+* +使用rails的scaffold或者generator时会生成ruby1.9的hash格式，使用参数--old-style-hash启用旧的形式：+
+
+bc(ruby).. redirect_to users_path, :notice => "User has been created" #变成
+redirect_to users_path, notice: "User has been created"
+
+p. 
+* Changed scaffold_controller generator to create format block for JSON instead of XML
+
+
