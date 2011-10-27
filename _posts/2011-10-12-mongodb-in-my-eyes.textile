@@ -1,0 +1,59 @@
+---
+layout: post
+title: mongodb小结
+lang: chinese
+meta: mongodb benefit index data model 好处 索引 数据模型
+---
+p. +本文只是个人总结，经验有限，难免有错误的地方，如有不当，指出讨论，不甚感谢。+
+
+p. 在使用了“芒果”一段时间后，挺喜欢这个文档型的数据库的，我这篇文章分为三个部分，分别是??MongoDB的特点以及适用场景??， ??MongoDB的数据格式以及如何设计好数据结构?? 和 ??MongoDB的索引??。
+
+*MongoDB的特点以及适用场景*
+
+&nbsp;&nbsp;&nbsp;&nbsp;MongoDB是基于文档的非关系型数据库，非关系型数据库带来的好处之一是不需要拆分数据表来进行复杂的关联。
+
+p. 
+
+* Document-oriented storage
+在MongoDB中，Document是最小单元，并且是以类似于JSON形式的BSON存储的，在我使用的过程中，尤其发现其dynamic schemas的特点。在原先的关系型数据库，对数据表的修改比较麻烦，并且可能导致不可预期的后果，这也是因为关系型数据库数据表之间多关联造成的，而在非关系型数据中就没有这个问题，我可以通通放在一个document中，重要的是每个document之间是彼此独立的，可以随时添加新的字段而不需要"alter table"，另外，dynamic schemas的另一个特点是不需要预先设计（预先设计是个好习惯），举个例子:
+
+bc(javascript).. //users表中有两个文档
+>db.users.find()
+{"name":"zires", "age":25}
+{"name":"jack", "age":27}
+
+p. 现在我们要插入新的用户，但是这个用户多个属性"address"，在关系型数据库中，我们需要修改表的结构，但是对于Mongodb则不需要，document彼此独立，只需插入就可以了：
+
+bc(javascript).. 
+>db.users.insert({name:"jobs",age:28,address:"some address"})
+>db.users.find()
+{"name":"zires", "age":25}
+{"name":"jack", "age":27}
+{"name":"jobs","age":28,"address":"some address"}
+
+p. 
+* Auto-Sharding
+MongoDB通过Auto-Sharding技术来提供数据库的水平扩展，看下面这张图就一目了然了：
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!http://files.note.sdo.com/6m_L-~jFpUWpnM0pI001B-!
+
+p. +为什么需要使用Sharding?+ 主要有两点： 1）垂直扩展会受到硬件开销的限制。2）很难在`云`上进行垂直扩展
+
+??shards : Can be master, master/slave, replica sets.??
+
+??Config Servers : 保存meta信息。??
+
+??mongos : 可以一个或多个， 主要是路由分发， 客户端透明。??
+
+参考 "MongoDB Sharding Slide":http://www.slideshare.net/mongodb/mongodb-sharding-internals
+
+p. 
+*MongoDB的数据格式以及如何设计好数据结构*
+
+占位待写
+
+p. 
+*MongoDB的索引*
+
+占位待写
+
