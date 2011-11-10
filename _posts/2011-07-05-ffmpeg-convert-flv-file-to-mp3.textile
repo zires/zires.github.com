@@ -1,0 +1,28 @@
+--- 
+layout: post
+title: ffmpeg convert flv file to mp3
+tags: 
+- convert
+- ffmpeg
+- ubuntu
+status: publish
+type: post
+published: true
+---
+Using ffmpeg for coverting .flv file to .mp3.
+
+bc().. ffmpeg -i source.flv -ab 128k -ac 2 -acodec libmp3lame output.mp3
+
+p. I got this error:
+
+bc().. unknown encoder 'libmp3lame'
+
+p. solution:
+
+bc().. [sudo] aptitude install libavcodec-extra-52
+
+p. 参数说明:
+
+bc().. -ac 声道
+-ar 采样率
+-ab 比特率

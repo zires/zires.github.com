@@ -1,0 +1,26 @@
+--- 
+layout: post
+title: invalid multibyte char (US-ASCII) ruby1.9
+tags: 
+- issues
+- Ruby&amp;Rails
+- ruby1.9
+status: publish
+type: post
+published: true
+lang: chinese
+---
+ruby1.9+rails3在helper方法中写中文时，出现 +invalid multibyte char (US-ASCII)+ 异常了，查了下，原来ruby1.9是用ASCII编码来读源码的，奇怪。
+解决办法是在文件的第一行加上
+
+bc(ruby).. # encoding: utf-8
+
+p. rails3中确定application.rb中有：
+
+bc(ruby).. # Configure the default encoding used in templates for Ruby 1.9.
+config.encoding = "utf-8"
+
+p. 阅读下面的文章：
+
+http://blog.grayproductions.net/articles/ruby_19s_three_default_encodings
+http://blog.grayproductions.net/articles/understanding_m17n

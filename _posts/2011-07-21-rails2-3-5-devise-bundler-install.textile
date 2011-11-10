@@ -8,25 +8,22 @@ tags:
 status: publish
 type: post
 published: true
-meta: 
-  _edit_lock: "1311217783"
-  _edit_last: "1"
+lang: chinese
 ---
 使用bundler在rails2.3.5项目中安装devise.
 
 我的环境参数：
-[cc]
-ruby 1.8.7-head
+
+bc(ruby).. ruby 1.8.7-head
 rails 2.3.5
-[/cc]
 
-<strong><em style="color: blue;">STEP1  生成一个Rails2.3.5项目，名为blog</em></strong>
-[cc]
-rails blog -d mysql
-[/cc]
+p. +STEP1  生成一个Rails2.3.5项目，名为blog+
 
-<strong><em style="color: blue;">STEP2  安装和配置bundler</em></strong>
-Bundler是rails3默认的gem包依赖管理工具，没有它真的很不方便，rails2.3.5也可以使用，<a href="http://gembundler.com/rails23.html" target="_blank">官方安装说明</a>.
+bc().. rails blog -d mysql
+
+p. +STEP2  安装和配置bundler+
+
+Bundler是rails3默认的gem包依赖管理工具，没有它真的很不方便，rails2.3.5也可以使用，"官方安装说明":http://gembundler.com/rails23.html
 
 首先：
 [cc]
