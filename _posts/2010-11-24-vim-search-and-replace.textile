@@ -1,0 +1,36 @@
+--- 
+layout: post
+title: vim search and replace
+lang: chinese
+meta: vim 搜索 替换
+---
+h1. 基本的查找，在命令模式下
+
+bc(ruby).. /example    ### 将从文档从上往下查找
+
+?example    ### 将从文档从下往上查找
+
+
+p. 基本的替换，在命令模式下
+
+bc(ruby).. ### range可选，如果不填的话只会匹配和替换第一行
+:[range]s /search/replace/
+
+### 搜索n到m行
+:n,m s /search/replace/
+
+p. 如果全文搜索替换呢
+
+bc(ruby).. ### 全文搜索
+%s/search/replace/g
+
+### 全文搜索，但是给出是否替换提示
+%s/search/replace/gc
+
+### 全文搜索，忽略大小写
+%s/search/replace/gi
+
+### 使用&quot;\&quot;转义
+%s/search\//replace/gi
+
+p. 常用的就这么多，特殊需求看文档
