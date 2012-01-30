@@ -148,6 +148,7 @@ cite{
 #main #aboutMe{
   color:#ffffff;
   text-shadow: 1px 1px 1px #000000;
+  clear: both;
 }
 
 #aboutMe .profile{
