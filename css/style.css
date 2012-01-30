@@ -82,7 +82,7 @@ a:hover { color: #fff; }
  */
 body{
   font: 13px/1.231 'Trebuchet MS', 'PT Sans', Helvetica, sans-serif;
-  background: url("/images/bg.jpg") repeat scroll 0 0 transparent;
+  background: url("http://pic.yupoo.com/zshuaibin/BHR6TDFz/medish.jpg") repeat scroll 0 0 transparent;
 }
 ul li{
   margin-bottom:5px;
@@ -273,7 +273,7 @@ img.effect{
 #main #content .slide{
   float:left;
   width:129px;
-  background: url("/images/slidebg.jpg") repeat scroll 0 0 transparent;
+  background: url("http://pic.yupoo.com/zshuaibin/BHR6TB7v/medish.jpg") repeat scroll 0 0 transparent;
   border-bottom: 1px solid #E7E7E7;
   border-right: 1px solid #E7E7E7;
   border-top: 1px solid #E7E7E7;
